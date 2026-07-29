@@ -13,11 +13,11 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const {
-  R2_ACCOUNT_ID,
+  R2_ENDPOINT,
   R2_ACCESS_KEY_ID,
   R2_SECRET_ACCESS_KEY,
   R2_BUCKET,
@@ -28,7 +28,7 @@ const {
 } = process.env;
 
 for (const [name, val] of Object.entries({
-  R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, FIREBASE_PROJECT_ID
+  R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, FIREBASE_PROJECT_ID
 })) {
   if (!val) console.warn(`[startup] Warning: env var ${name} is not set.`);
 }
@@ -36,7 +36,7 @@ for (const [name, val] of Object.entries({
 // ---------------- R2 client (S3-compatible) ----------------
 const s3 = new S3Client({
   region: 'auto',
-  endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  endpoint: R2_ENDPOINT, // e.g. https://<account-id>.r2.cloudflarestorage.com — from the Cloudflare R2 API token page
   credentials: {
     accessKeyId: R2_ACCESS_KEY_ID,
     secretAccessKey: R2_SECRET_ACCESS_KEY
@@ -81,7 +81,10 @@ const OWNED_PREFIXES = [
   { prefix: (uid) => `profiles/${uid}/`, public: true },
   { prefix: (uid) => `covers/${uid}/`, public: true },
   { prefix: (uid) => `product-covers/${uid}/`, public: true },
-  { prefix: (uid) => `product-files/${uid}/`, public: false }
+  { prefix: (uid) => `product-files/${uid}/`, public: false },
+  { prefix: (uid) => `archive/${uid}/`, public: false },
+  { prefix: (uid) => `testimonial-photos/${uid}/`, public: true },
+  { prefix: (uid) => `community-value/${uid}/`, public: true }
 ];
 
 function resolveOwnedPrefix(uid, key) {
@@ -92,7 +95,10 @@ const MAX_SIZES = {
   'profiles/': 15 * 1024 * 1024,
   'covers/': 15 * 1024 * 1024,
   'product-covers/': 15 * 1024 * 1024,
-  'product-files/': 50 * 1024 * 1024
+  'product-files/': 50 * 1024 * 1024,
+  'archive/': 60 * 1024 * 1024,
+  'testimonial-photos/': 10 * 1024 * 1024,
+  'community-value/': 60 * 1024 * 1024
 };
 function maxSizeFor(key) {
   const hit = Object.keys(MAX_SIZES).find((p) => key.startsWith(p));
@@ -131,6 +137,23 @@ app.post('/api/r2/presign-upload', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('presign-upload failed:', err);
     res.status(500).json({ error: 'Could not create an upload link. Please try again.' });
+  }
+});
+
+app.post('/api/r2/presign-download', requireAuth, async (req, res) => {
+  try {
+    const { key } = req.body || {};
+    if (!key || typeof key !== 'string') return res.status(400).json({ error: 'Missing key.' });
+
+    const match = resolveOwnedPrefix(req.uid, key);
+    if (!match) return res.status(403).json({ error: 'You can only view your own files.' });
+
+    const command = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
+    const downloadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
+    res.json({ downloadUrl });
+  } catch (err) {
+    console.error('presign-download failed:', err);
+    res.status(500).json({ error: 'Could not open that file. Please try again.' });
   }
 });
 
