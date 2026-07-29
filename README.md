@@ -89,6 +89,88 @@ the app works end-to-end. What changed:
   still stuck with `isActive: false` in Firestore — either re-register
   them, or manually flip that field to `true` in the Firestore console.
 
+## Phase 4.5 — Community Value feed (Builders' media, playable by Community)
+
+Archive is private (owner-only) and product files are payment-gated, so
+there was no path for Community to actually play a Builder's video/audio
+before this. Fixed by building **Community Value** — the free public feed
+tab (first tab, matching the original design doc's tab order) on every
+Builder's Market page:
+
+- Builders post photos, videos, audio, or text updates — genuinely public,
+  stored under `community-value/{uid}/` in R2 (public prefix, unlike
+  Archive or product files).
+- Any signed-in Community member (or another Builder) visiting that
+  Builder's Market sees these rendered as real inline players — `<video
+  controls>`, `<audio controls>`, `<img>` — no gating, no purchase
+  required, no presigned-URL round trip needed since it's public content
+  served straight from R2.
+- Deleting a post removes both the Firestore doc and the R2 file.
+- Builder Market now opens on the Updates tab by default, so Community
+  lands directly on playable content.
+
+This is distinct from **Archive** (private personal library, owner-only)
+and **product files** (for sale, stay private until Payments gates
+downloads) — Community Value is the one that's meant to be freely played
+by anyone.
+
+## Phase 4 — Auth bug fix + real Archive/Testimonials, honest scope on Live
+
+**Critical fix: registration/login "insufficient permissions" error.**
+Root cause: phone-uniqueness checks (at registration) and phone-based
+login both queried the `users` collection, which requires `isSignedIn()`
+to read — but those queries run *before* the user is authenticated.
+Firestore correctly rejected them every time. Fixed with a new, minimal,
+publicly-readable `phoneIndex` collection (just phone -> {uid, email},
+nothing sensitive) that both flows use instead. `firestore.rules` updated
+to match — **redeploy the rules file**, this won't work with the old one.
+
+**Builder Archive** (`#/archive`) — real private media library. Upload
+photos, videos, or music (stored in R2 under `archive/{uid}/`, never
+public), filter by type, view (opens a short-lived signed URL — even
+private files, the owner can still play them), delete. This is the
+general-purpose "upload video/image/music" feature, separate from product
+uploads.
+
+**Testimonials** — a real Community-side upload feature. On any Builder's
+Market (`#/builder-market`), anyone signed in *except* the Builder
+themself can leave a text testimonial with an optional photo. Public read,
+photos go to `testimonial-photos/{uid}/` (public in R2).
+
+**Live sessions** — added as a tab in Builder Market, but intentionally
+**not** built as a working feature yet. Cloudflare R2 is object storage;
+it has no live video ingest (RTMP) or playback pipeline. Faking this would
+mean a broken "Go Live" button. Real live streaming needs a dedicated
+provider — Cloudflare Stream Live, Mux, or similar — each with its own
+pricing and setup. Worth a separate conversation before building it,
+rather than bolting on something that doesn't actually stream.
+
+**Backend additions** (`r2-media-api`): new `archive/{uid}/` (private) and
+`testimonial-photos/{uid}/` (public) prefixes, plus a
+`/api/r2/presign-download` endpoint so owners can view their own private
+files (Archive) — previously the API could only issue upload/delete URLs.
+
+## Setting up your R2 credentials on Render
+
+Cloudflare gives you exactly 3 values when you create an R2 API token —
+put them straight into `r2-media-api`'s environment variables on Render
+(Render dashboard -> your service -> Environment), never into any file in
+this repo:
+
+- `R2_ENDPOINT` <- the endpoint URL Cloudflare showed you
+- `R2_ACCESS_KEY_ID` <- Access Key ID
+- `R2_SECRET_ACCESS_KEY` <- Secret Access Key
+
+You'll also set `R2_BUCKET` (the name you gave your bucket) and
+`R2_PUBLIC_BASE_URL` (from enabling the bucket's public r2.dev URL, or a
+custom domain) yourself — see `r2-media-api/.env.example` for the full
+list with explanations.
+
+**Important:** if you've ever pasted real API keys into a chat, doc, or
+anywhere outside Render's environment variables, treat them as
+compromised and regenerate them from the Cloudflare dashboard. Anyone who
+can read that text can read/write/delete your entire R2 bucket.
+
 ## Phase 3.5 — Swapped Firebase Storage for Cloudflare R2
 
 Firebase's billing-account requirement for Storage was blocking you, so
