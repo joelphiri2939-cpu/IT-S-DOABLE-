@@ -1,0 +1,3809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>IT'S DOABLE! TALENT — Builder Development Platform</title>
+<meta name="description" content="Helping Builders turn their talent into sustainable income.">
+<meta name="theme-color" content="#0E9194">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#0E9194;
+    --teal-dark:#0B6D70;
+    --teal-light:#14B8BB;
+    --maroon:#6E1430;
+    --maroon-dark:#4E0E22;
+    --maroon-light:#8C1D40;
+    --gold:#F0A93E;
+    --black:#121212;
+    --ink:#1A1A1A;
+    --ink-soft:#5B5F63;
+    --white:#FFFFFF;
+    --surface:#F6F7F8;
+    --border:#E4E6E8;
+    --danger:#C6303E;
+    --success:#1E8E5A;
+    --radius:16px;
+    --radius-sm:10px;
+    --font-display:'Sora',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --safe-top:env(safe-area-inset-top);
+    --safe-bottom:env(safe-area-inset-bottom);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; height:100%;}
+  body{
+    font-family:var(--font-body);
+    color:var(--ink);
+    background:var(--surface);
+    overscroll-behavior-y:none;
+  }
+  h1,h2,h3,h4{font-family:var(--font-display); margin:0; letter-spacing:-0.01em;}
+  p{margin:0;}
+  button{font-family:inherit; cursor:pointer;}
+  input,select{font-family:inherit;}
+  a{color:inherit;}
+
+  #app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    min-height:100dvh;
+    background:var(--white);
+    position:relative;
+    box-shadow:0 0 40px rgba(0,0,0,0.08);
+  }
+
+  .screen{
+    display:none;
+    min-height:100vh;
+    min-height:100dvh;
+    flex-direction:column;
+  }
+  .screen.active{display:flex;}
+
+  /* ---------- SPLASH ---------- */
+  #screen-splash{
+    background:linear-gradient(160deg, var(--teal-dark) 0%, var(--black) 52%, var(--maroon-dark) 100%);
+    align-items:center;
+    justify-content:center;
+    color:var(--white);
+    padding:32px;
+    text-align:center;
+  }
+  .splash-logo-wrap{position:relative; margin-bottom:22px;}
+  .splash-logo{
+    width:96px; height:96px; border-radius:26px; overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,0.35);
+    animation:pop-in 700ms cubic-bezier(.2,.9,.25,1) both;
+  }
+  .splash-logo img{width:100%; height:100%; display:block;}
+  @keyframes pop-in{from{transform:scale(.7); opacity:0;} to{transform:scale(1); opacity:1;}}
+  .splash-mark{
+    position:absolute; right:-10px; bottom:-10px; width:34px; height:34px; border-radius:50%;
+    background:var(--gold); color:var(--maroon-dark); display:flex; align-items:center; justify-content:center;
+    font-size:17px; box-shadow:0 6px 16px rgba(0,0,0,.35), 0 0 0 3px var(--black);
+    animation:pop-in 700ms 250ms cubic-bezier(.2,.9,.25,1) both;
+  }
+  .splash-word{font-size:30px; font-weight:800; line-height:1.1;}
+  .splash-word span{color:var(--gold);}
+  .splash-tag{margin-top:8px; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.7);}
+  .splash-loader{
+    margin-top:34px; width:34px; height:34px; border-radius:50%;
+    border:3px solid rgba(255,255,255,.25); border-top-color:var(--gold);
+    animation:spin 850ms linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- SHARED SCREEN CHROME ---------- */
+  .topbar{
+    display:flex; align-items:center; gap:12px;
+    padding:calc(14px + var(--safe-top)) 20px 14px;
+    position:sticky; top:0; z-index:5; background:var(--white);
+    border-bottom:1px solid var(--border);
+  }
+  .topbar .back{
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--border);
+    background:var(--white); display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .topbar h2{font-size:17px;}
+  .screen-body{padding:20px 20px calc(28px + var(--safe-bottom)); flex:1; overflow-y:auto;}
+
+  /* ---------- WELCOME / ROLE SELECT ---------- */
+  #screen-welcome .screen-body{
+    display:flex; flex-direction:column; justify-content:center; gap:26px;
+    background:radial-gradient(120% 90% at 50% -10%, rgba(14,145,148,.08), transparent 60%);
+  }
+  .welcome-head{text-align:center; padding:8px 0 4px;}
+  .welcome-head .eyebrow{
+    display:inline-block; font-size:12px; font-weight:700; letter-spacing:.1em;
+    color:var(--teal-dark); text-transform:uppercase; margin-bottom:10px;
+  }
+  .welcome-head h1{font-size:24px;}
+  .welcome-head p{margin-top:8px; color:var(--ink-soft); font-size:14.5px;}
+
+  .role-card{
+    display:flex; align-items:center; gap:14px; text-align:left;
+    width:100%; padding:18px; border-radius:var(--radius); border:1.5px solid var(--border);
+    background:var(--white); transition:transform .12s ease, border-color .12s ease;
+  }
+  .role-card:active{transform:scale(.98);}
+  .role-card .icon{
+    width:52px; height:52px; border-radius:14px; flex:none;
+    display:flex; align-items:center; justify-content:center; color:var(--white);
+  }
+  .role-card.builder .icon{background:linear-gradient(135deg,var(--teal),var(--teal-dark));}
+  .role-card.community .icon{background:linear-gradient(135deg,var(--maroon-light),var(--maroon-dark));}
+  .role-card strong{font-family:var(--font-display); font-size:16px; display:block;}
+  .role-card span{font-size:13px; color:var(--ink-soft); display:block; margin-top:2px;}
+  .role-card:active{border-color:var(--teal);}
+
+  /* ---------- FORMS ---------- */
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-size:13px; font-weight:600; margin-bottom:6px; color:var(--ink);}
+  .field .hint{font-size:12px; color:var(--ink-soft); margin-top:5px;}
+  .field input, .field select{
+    width:100%; padding:13px 14px; border-radius:var(--radius-sm); border:1.5px solid var(--border);
+    font-size:15px; background:var(--white); color:var(--ink);
+  }
+  .field input:focus, .field select:focus{outline:none; border-color:var(--teal);}
+  .field.error input, .field.error select{border-color:var(--danger);}
+  .field .error-msg{font-size:12px; color:var(--danger); margin-top:5px; display:none;}
+  .field.error .error-msg{display:block;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .pw-wrap{position:relative;}
+  .pw-toggle{
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    background:none; border:none; font-size:12px; font-weight:700; color:var(--teal-dark); padding:6px;
+  }
+  fieldset{border:none; padding:0; margin:0 0 18px;}
+  legend{font-family:var(--font-display); font-size:14px; font-weight:700; color:var(--maroon-dark); margin-bottom:10px; padding:0;}
+
+  .btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:15px 18px; border-radius:14px; border:none;
+    font-family:var(--font-display); font-weight:700; font-size:15px;
+    transition:transform .1s ease, opacity .15s ease;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn:disabled{opacity:.55; pointer-events:none;}
+  .btn-primary{background:var(--teal); color:var(--white);}
+  .btn-maroon{background:var(--maroon); color:var(--white);}
+  .btn-outline{background:transparent; color:var(--ink); border:1.5px solid var(--border);}
+  .btn-link{background:none; color:var(--teal-dark); font-weight:600; padding:8px; font-size:13.5px;}
+  .btn-spinner{width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; animation:spin .7s linear infinite; display:none;}
+  .btn.loading .btn-spinner{display:inline-block;}
+  .btn.loading .btn-label{opacity:.85;}
+
+  .divider{display:flex; align-items:center; gap:10px; margin:18px 0; color:var(--ink-soft); font-size:12px;}
+  .divider::before,.divider::after{content:''; flex:1; height:1px; background:var(--border);}
+
+  .row-between{display:flex; align-items:center; justify-content:space-between; margin:14px 0 20px;}
+  .checkbox-row{display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--ink-soft);}
+  .checkbox-row input{width:16px; height:16px;}
+
+  .foot-note{text-align:center; margin-top:20px; font-size:13.5px; color:var(--ink-soft);}
+  .foot-note button{color:var(--teal-dark); font-weight:700; background:none; border:none; font-size:13.5px;}
+
+  /* ---------- PENDING / STUB SCREENS ---------- */
+  .status-panel{
+    text-align:center; padding:34px 22px; border-radius:var(--radius);
+    background:var(--surface); border:1px solid var(--border);
+  }
+  .status-panel .badge{
+    width:56px; height:56px; border-radius:50%; margin:0 auto 16px;
+    display:flex; align-items:center; justify-content:center; color:var(--white); background:var(--gold);
+  }
+  .status-panel h3{font-size:18px; margin-bottom:8px;}
+  .status-panel p{color:var(--ink-soft); font-size:14px; line-height:1.5;}
+  .kv-list{margin-top:18px; text-align:left; border-top:1px solid var(--border); padding-top:14px;}
+  .kv-row{display:flex; justify-content:space-between; padding:6px 0; font-size:13.5px;}
+  .kv-row span:first-child{color:var(--ink-soft);}
+  .kv-row span:last-child{font-weight:600;}
+
+  /* ---------- TOASTS ---------- */
+  #toast-host{
+    position:fixed; left:0; right:0; bottom:calc(18px + var(--safe-bottom)); z-index:999;
+    display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none;
+    max-width:480px; margin:0 auto;
+  }
+  .toast{
+    pointer-events:auto; max-width:88%; padding:12px 16px; border-radius:12px;
+    background:var(--ink); color:var(--white); font-size:13.5px; box-shadow:0 8px 24px rgba(0,0,0,.25);
+    animation:toast-in .25s ease both;
+  }
+  .toast.error{background:var(--danger);}
+  .toast.success{background:var(--success);}
+  @keyframes toast-in{from{transform:translateY(10px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+
+  /* ---------- HOME (placeholder shell for phase 2+) ---------- */
+  .home-hero{
+    background:linear-gradient(135deg, var(--teal-dark), var(--maroon-dark));
+    color:var(--white); padding:22px 20px calc(30px + var(--safe-top)); position:relative;
+  }
+  .home-hero .hello{font-size:13px; color:rgba(255,255,255,.75);}
+  .home-hero h2{font-size:20px; margin-top:2px;}
+  .home-hero .role-chip{
+    display:inline-flex; margin-top:10px; padding:5px 12px; border-radius:999px;
+    background:rgba(255,255,255,.15); font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+  }
+  .phase-note{
+    margin:18px 20px 0; padding:16px; border-radius:var(--radius-sm); background:#FFF6E8; border:1px solid #F3DBA6;
+    font-size:13px; color:#7A5A16; line-height:1.5;
+  }
+  .signout-btn{margin:22px 20px 0;}
+  .sub-chip{
+    display:inline-flex; margin-top:8px; margin-left:8px; padding:5px 12px; border-radius:999px;
+    background:rgba(240,169,62,.22); color:var(--gold); font-size:11.5px; font-weight:700;
+  }
+
+  /* ---------- BOTTOM NAV ---------- */
+  .has-bottom-nav .screen-body{padding-bottom:calc(96px + var(--safe-bottom));}
+  .has-bottom-nav .home-hero{padding-bottom:26px;}
+  .bottom-nav{
+    display:none; position:fixed; left:0; right:0; bottom:0; z-index:20;
+    max-width:480px; margin:0 auto; background:var(--white); border-top:1px solid var(--border);
+    padding:8px 6px calc(8px + var(--safe-bottom));
+    grid-template-columns:repeat(4,1fr);
+  }
+  .bottom-nav.visible{display:grid;}
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none;
+    padding:6px 2px; border-radius:10px; color:var(--ink-soft); font-size:11px; font-weight:600;
+  }
+  .nav-item .nav-ic{font-size:19px; line-height:1;}
+  .nav-item.active{color:var(--teal-dark);}
+
+  /* ---------- DASHBOARD GRID ---------- */
+  .dash-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:-14px;}
+  .dash-card{
+    display:flex; flex-direction:column; align-items:flex-start; gap:10px;
+    background:var(--white); border:1.5px solid var(--border); border-radius:var(--radius);
+    padding:16px; text-align:left;
+  }
+  .dash-card:active{transform:scale(.97);}
+  .dash-card strong{font-family:var(--font-display); font-size:13.5px; color:var(--ink);}
+  .dash-ic{
+    width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    font-size:19px;
+  }
+  .dash-ic.teal{background:rgba(14,145,148,.14);}
+  .dash-ic.maroon{background:rgba(110,20,48,.12);}
+  .dash-ic.gold{background:rgba(240,169,62,.18);}
+
+  /* ---------- WALLET ---------- */
+  .wallet-balance-card{
+    background:linear-gradient(135deg, var(--teal-dark), var(--maroon-dark)); color:var(--white);
+    border-radius:var(--radius); padding:26px 20px; text-align:center;
+  }
+  .wb-label{font-size:12.5px; color:rgba(255,255,255,.75); letter-spacing:.06em; text-transform:uppercase;}
+  .wb-amount{font-family:var(--font-display); font-size:34px; font-weight:800; margin-top:8px;}
+  .wb-currency{font-size:12px; color:rgba(255,255,255,.7); margin-top:2px;}
+
+  /* ---------- DISCOVER LIST ---------- */
+  .builder-card{
+    display:flex; align-items:center; gap:12px; padding:14px; border:1.5px solid var(--border);
+    border-radius:var(--radius-sm); margin-bottom:10px;
+  }
+  .builder-avatar{
+    width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--teal),var(--maroon));
+    color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display);
+    font-weight:700; flex:none;
+  }
+  .builder-card .bname{font-family:var(--font-display); font-weight:700; font-size:14.5px;}
+  .builder-card .bmeta{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+  .empty-state{text-align:center; padding:36px 16px; color:var(--ink-soft); font-size:13.5px;}
+
+  /* ---------- PROFILE PHOTO / UPLOADS ---------- */
+  .profile-photo-row{display:flex; align-items:center; gap:16px; margin-bottom:18px;}
+  .avatar-lg{
+    width:64px; height:64px; border-radius:50%; flex:none; overflow:hidden;
+    background:linear-gradient(135deg,var(--teal),var(--maroon)); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:700; font-size:22px;
+  }
+  .avatar-lg img{width:100%; height:100%; object-fit:cover;}
+  .upload-field{margin-bottom:18px;}
+  .upload-field > label:first-child{display:block; font-size:13px; font-weight:600; margin-bottom:8px;}
+  .upload-preview-row{display:flex; align-items:center; gap:14px; margin-bottom:8px;}
+  .upload-btn{display:inline-flex; width:auto; padding:10px 16px; font-size:13px;}
+  .cover-preview{
+    width:100%; height:110px; border-radius:var(--radius-sm); background:var(--surface);
+    border:1.5px dashed var(--border); display:flex; align-items:center; justify-content:center;
+    color:var(--ink-soft); font-size:13px; margin-bottom:8px; overflow:hidden;
+  }
+  .cover-preview img{width:100%; height:100%; object-fit:cover;}
+  .upload-progress{height:6px; border-radius:3px; background:var(--border); margin-top:10px; overflow:hidden;}
+  .upload-progress-bar{height:100%; width:0%; background:var(--teal); transition:width .2s ease;}
+  textarea{
+    width:100%; padding:13px 14px; border-radius:var(--radius-sm); border:1.5px solid var(--border);
+    font-size:15px; font-family:inherit; resize:vertical;
+  }
+  textarea:focus{outline:none; border-color:var(--teal);}
+
+  /* ---------- PRODUCT CARDS ---------- */
+  .product-card{
+    border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:14px;
+  }
+  .product-cover{width:100%; height:140px; background:var(--surface); object-fit:cover; display:block;}
+  .product-cover-fallback{
+    width:100%; height:140px; background:linear-gradient(135deg,var(--teal),var(--maroon));
+    display:flex; align-items:center; justify-content:center; color:#fff; font-size:28px;
+  }
+  .product-body{padding:14px;}
+  .product-body .ptitle{font-family:var(--font-display); font-weight:700; font-size:15px;}
+  .product-body .pcat{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+  .product-body .pprice{font-family:var(--font-display); font-weight:800; color:var(--maroon-dark); margin-top:8px; font-size:15px;}
+  .product-actions{display:flex; gap:10px; margin-top:12px;}
+  .product-actions .btn{padding:10px 12px; font-size:12.5px;}
+  .btn-danger-outline{background:transparent; color:var(--danger); border:1.5px solid var(--danger);}
+
+  /* ---------- ARCHIVE ---------- */
+  .chip-row{display:flex; gap:8px; margin-bottom:16px; overflow-x:auto;}
+  .chip{
+    flex:none; padding:8px 14px; border-radius:999px; border:1.5px solid var(--border);
+    background:var(--white); color:var(--ink-soft); font-size:12.5px; font-weight:600;
+  }
+  .chip.active{background:var(--teal); border-color:var(--teal); color:#fff;}
+  .archive-card{
+    display:flex; align-items:center; gap:12px; padding:12px; border:1.5px solid var(--border);
+    border-radius:var(--radius-sm); margin-bottom:10px;
+  }
+  .archive-ic{
+    width:42px; height:42px; border-radius:10px; flex:none; display:flex; align-items:center; justify-content:center;
+    font-size:18px; background:var(--surface);
+  }
+  .archive-info{flex:1; min-width:0;}
+  .archive-info .atitle{font-family:var(--font-display); font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .archive-info .ameta{font-size:11.5px; color:var(--ink-soft); margin-top:2px;}
+  .archive-actions{display:flex; gap:6px; flex:none;}
+  .icon-btn{
+    width:34px; height:34px; border-radius:9px; border:1.5px solid var(--border); background:var(--white);
+    display:flex; align-items:center; justify-content:center; font-size:14px;
+  }
+
+  /* ---------- MARKET TABS / TESTIMONIALS ---------- */
+  .tab-row{display:flex; gap:8px; margin-bottom:16px;}
+  .tab-btn{
+    flex:1; padding:10px; border-radius:10px; border:1.5px solid var(--border); background:var(--white);
+    font-size:13px; font-weight:700; color:var(--ink-soft); font-family:var(--font-display);
+  }
+  .tab-btn.active{background:var(--maroon); border-color:var(--maroon); color:#fff;}
+  .testimonial-card{
+    padding:14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); margin-bottom:12px;
+  }
+  .testimonial-card .thead{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
+  .testimonial-card .tphoto{width:100%; border-radius:10px; margin-top:10px; display:block;}
+  .testimonial-card .tauthor{font-family:var(--font-display); font-weight:700; font-size:13px;}
+  .testimonial-card .ttext{font-size:13.5px; color:var(--ink); line-height:1.5;}
+
+  /* ---------- COMMUNITY VALUE FEED ---------- */
+  .cv-card{border:1.5px solid var(--border); border-radius:var(--radius); margin-bottom:14px; overflow:hidden;}
+  .cv-card .cv-media{width:100%; display:block; background:#000;}
+  .cv-card img.cv-media{object-fit:cover; max-height:320px;}
+  .cv-card video.cv-media{max-height:320px;}
+  .cv-card audio.cv-media{width:100%; padding:14px;}
+  .cv-body{padding:12px 14px;}
+  .cv-caption{font-size:13.5px; color:var(--ink); line-height:1.5;}
+  .cv-meta{display:flex; justify-content:space-between; align-items:center; margin-top:8px;}
+  .cv-type-tag{font-size:11px; font-weight:700; color:var(--teal-dark); text-transform:uppercase; letter-spacing:.04em;}
+  .cv-media-actions{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  .cv-media-actions .btn{flex:1; padding:8px 6px; font-size:12px; white-space:nowrap; min-width:88px;}
+
+  .market-join-bar{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:12px 16px; background:var(--surface); border-bottom:1px solid var(--border);
+  }
+  .market-join-bar span{font-size:12.5px; color:var(--ink-soft); flex:1;}
+  .market-join-bar .btn{padding:8px 16px; font-size:12.5px; white-space:nowrap;}
+
+  .locked-prompt{padding:36px 20px; text-align:center; line-height:1.5;}
+
+  .cv-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-bottom:18px;}
+  .cv-grid-item{
+    position:relative; aspect-ratio:1/1; border:none; padding:0; overflow:hidden;
+    background:#111; border-radius:4px;
+  }
+  .cv-grid-item img,.cv-grid-item video{width:100%; height:100%; object-fit:cover; display:block;}
+  .cv-grid-play{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:20px; text-shadow:0 1px 4px rgba(0,0,0,.6); pointer-events:none;
+  }
+  .cv-grid-audio-tile{
+    width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px; background:linear-gradient(160deg,var(--teal),var(--teal-dark)); color:#fff; font-size:22px; padding:8px; text-align:center;
+  }
+  .cv-grid-audio-tile span{font-size:10.5px; font-weight:600; line-height:1.3; -webkit-line-clamp:2; display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden;}
+
+  .media-lightbox{
+    position:fixed; inset:0; z-index:999; background:rgba(0,0,0,.92);
+    display:flex; flex-direction:column; align-items:center;
+    padding:0; overflow:hidden;
+  }
+  .lightbox-scroll{
+    width:100%; max-width:520px; height:100%; overflow-y:auto;
+    padding:calc(60px + var(--safe-top)) 16px calc(24px + var(--safe-bottom));
+    display:flex; flex-direction:column; gap:14px; align-items:center;
+  }
+  .media-lightbox-content{max-width:100%; display:flex; align-items:center; justify-content:center;}
+  .media-lightbox-content img,.media-lightbox-content video{max-width:100%; max-height:60vh; border-radius:8px;}
+  .media-lightbox-content audio{width:min(90vw,420px);}
+  .media-lightbox-caption{color:#fff; font-size:13.5px; text-align:center; max-width:90vw;}
+  .media-lightbox-close{
+    position:fixed; top:calc(16px + var(--safe-top)); right:16px; z-index:1000;
+    width:38px; height:38px; border-radius:50%; border:none;
+    background:rgba(255,255,255,.15); color:#fff; font-size:16px;
+  }
+  .cv-media-actions{width:100%;}
+
+  .lightbox-reactions{display:flex; gap:8px; width:100%; flex-wrap:wrap; justify-content:center;}
+  .reaction-btn{
+    background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.2); color:#fff;
+    border-radius:20px; padding:6px 12px; font-size:14px; display:flex; align-items:center; gap:5px;
+  }
+  .reaction-btn span{font-size:11.5px; font-weight:700; color:rgba(255,255,255,.8);}
+  .reaction-btn.active{background:var(--teal); border-color:var(--teal);}
+
+  .lightbox-comments{width:100%; background:rgba(255,255,255,.06); border-radius:12px; padding:14px;}
+  .lightbox-comments h4{color:#fff; font-size:13px; margin-bottom:10px;}
+  .comment-item{position:relative; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.08);}
+  .comment-item:last-of-type{border-bottom:none;}
+  .comment-author{color:var(--teal-light); font-size:11.5px; font-weight:700;}
+  .comment-text{color:#fff; font-size:13px; line-height:1.4;}
+  .comment-actions{display:flex; justify-content:flex-end; gap:12px; margin-top:4px;}
+  .comment-report{background:none; border:none; color:rgba(255,255,255,.5); font-size:11.5px;}
+  .comment-delete{
+    background:none; border:none; color:rgba(255,255,255,.5); font-size:13px;
+  }
+  .comment-input-row{display:flex; gap:8px; margin-top:12px;}
+  .comment-input-row input{
+    flex:1; border-radius:20px; border:1.5px solid rgba(255,255,255,.25); background:rgba(255,255,255,.08);
+    color:#fff; padding:9px 14px; font-size:13px;
+  }
+  .comment-input-row input::placeholder{color:rgba(255,255,255,.5);}
+  .comment-input-row .btn{padding:9px 16px; font-size:12.5px; white-space:nowrap;}
+  .lightbox-comments .empty-state{color:rgba(255,255,255,.6); padding:6px 0;}
+
+  /* ---------- MORE-OPTIONS MENU (report/block) ---------- */
+  .more-btn{
+    background:none; border:none; width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-size:18px; flex:none;
+  }
+  .more-menu{
+    position:absolute; right:0; top:36px; z-index:30; background:var(--white); border:1px solid var(--border);
+    border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.15); min-width:170px; overflow:hidden; display:none;
+  }
+  .more-menu.open{display:block;}
+  .more-menu button{
+    display:block; width:100%; text-align:left; padding:12px 14px; background:none; border:none; font-size:13.5px;
+    color:var(--ink); border-bottom:1px solid var(--border);
+  }
+  .more-menu button:last-child{border-bottom:none;}
+  .more-menu button.danger{color:var(--danger);}
+  .more-wrap{position:relative;}
+
+  /* ---------- REPORT MODAL ---------- */
+  .report-overlay{
+    position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.55); display:none;
+    align-items:flex-end; justify-content:center;
+  }
+  .report-overlay.open{display:flex;}
+  .report-sheet{
+    width:100%; max-width:480px; background:var(--white); border-radius:20px 20px 0 0;
+    padding:20px 20px calc(20px + var(--safe-bottom)); max-height:80vh; overflow-y:auto;
+  }
+  .report-sheet h3{font-size:16px; margin-bottom:4px;}
+  .report-sheet .sub{font-size:12.5px; color:var(--ink-soft); margin-bottom:16px;}
+  .report-reason{
+    display:flex; align-items:center; gap:10px; padding:12px; border:1.5px solid var(--border);
+    border-radius:12px; margin-bottom:8px; font-size:13.5px;
+  }
+  .report-reason input{width:16px; height:16px;}
+  .report-sheet textarea{margin-top:8px;}
+
+  /* ---------- ONLINE STATUS ---------- */
+  .avatar-wrap{position:relative; flex:none;}
+  .online-dot{
+    position:absolute; right:-1px; bottom:-1px; width:12px; height:12px; border-radius:50%;
+    background:var(--success); border:2px solid var(--white);
+  }
+  .presence-text{font-size:11.5px; color:var(--ink-soft);}
+  .presence-text.online{color:var(--success); font-weight:600;}
+
+  /* ---------- FOR YOU FEED ---------- */
+  .feed-card{border:1.5px solid var(--border); border-radius:var(--radius); margin-bottom:16px; overflow:hidden;}
+  .feed-card-header{display:flex; align-items:center; gap:10px; padding:12px 14px;}
+  .feed-card-identity{flex:1; min-width:0;}
+  .feed-card-identity .fname{font-family:var(--font-display); font-weight:700; font-size:13.5px;}
+  .feed-follow-btn{flex:none; padding:7px 14px; font-size:12px; width:auto;}
+  .feed-media{display:block; width:100%; border:none; padding:0; background:#111; cursor:pointer;}
+  .feed-media img, .feed-media video{width:100%; max-height:380px; object-fit:cover; display:block;}
+
+  /* ---------- INLINE AUTOPLAY VIDEO (feed) ---------- */
+  .feed-media-wrap{position:relative; background:#000;}
+  .feed-inline-video{width:100%; max-height:460px; display:block; object-fit:cover; background:#000;}
+  .feed-mute-btn, .feed-expand-btn{
+    position:absolute; width:36px; height:36px; border-radius:50%; border:none;
+    background:rgba(0,0,0,.55); color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center;
+  }
+  .feed-mute-btn{right:12px; bottom:12px;}
+  .feed-expand-btn{right:12px; top:12px; font-size:13px;}
+  .feed-media .cv-grid-audio-tile{aspect-ratio:16/9; border-radius:0;}
+  .feed-card-body{padding:12px 14px;}
+  .feed-actions{display:flex; align-items:center; gap:14px; margin-top:10px; font-size:12px; color:var(--ink-soft);}
+  .feed-actions button{background:none; border:none; color:var(--ink-soft); font-size:12px; font-weight:600; display:flex; align-items:center; gap:4px;}
+  .feed-follow-section{display:flex; justify-content:center; margin:18px 0;}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- SPLASH -->
+  <section class="screen" id="screen-splash">
+    <div class="splash-logo-wrap">
+      <div class="splash-logo"><img src="./icons/icon-512.png" alt="IT'S DOABLE! TALENT logo"></div>
+      <div class="splash-mark" aria-hidden="true">✍</div>
+    </div>
+    <div class="splash-word">IT'S DOABLE! <span>TALENT</span></div>
+    <div class="splash-tag">Making Your Dream REAL</div>
+    <div class="splash-loader"></div>
+  </section>
+
+  <!-- WELCOME / ROLE SELECT -->
+  <section class="screen" id="screen-welcome">
+    <div class="screen-body">
+      <div class="welcome-head">
+        <span class="eyebrow">Built for three</span>
+        <h1>Who are you?</h1>
+        <p>Tell us how you'll be using IT'S DOABLE! TALENT.</p>
+      </div>
+      <button class="role-card builder" data-nav="#/register-builder">
+        <span class="icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 0 1 1.4 0l1.6 1.6a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-.5.27l-3 .7a.5.5 0 0 1-.6-.6l.7-3a1 1 0 0 1 .27-.5l8-8Z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M13 8l3 3" stroke="#fff" stroke-width="1.6"/></svg>
+        </span>
+        <span>
+          <strong>I am a Builder</strong>
+          <span>Building a talent, skill, or profession — K62.50/month</span>
+        </span>
+      </button>
+      <button class="role-card community" data-nav="#/register-community">
+        <span class="icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8.5" r="2.8" stroke="#fff" stroke-width="1.6"/><path d="M3.5 18.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="17" cy="9" r="2.2" stroke="#fff" stroke-width="1.6"/><path d="M15.3 13.6c2.4.2 4.2 1.9 4.2 4.4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </span>
+        <span>
+          <strong>I am Community</strong>
+          <span>Discover, support, and reward Builders — Free</span>
+        </span>
+      </button>
+      <div class="foot-note">Already have an account?
+        <button data-nav="#/login">Log in</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGISTER: BUILDER -->
+  <section class="screen" id="screen-register-builder">
+    <div class="topbar">
+      <button class="back" data-nav="#/welcome" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2>Builder Registration</h2>
+    </div>
+    <div class="screen-body">
+      <form id="form-register-builder" novalidate>
+        <fieldset>
+          <legend>About you</legend>
+          <div class="field" data-field="realName">
+            <label for="b-realName">Real name</label>
+            <input id="b-realName" name="realName" type="text" autocomplete="name" required>
+            <div class="error-msg">Enter your full name.</div>
+          </div>
+          <div class="field" data-field="brandName">
+            <label for="b-brandName">Brand name</label>
+            <input id="b-brandName" name="brandName" type="text" placeholder="How Community will know you" required>
+            <div class="error-msg">Enter a brand name.</div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Contact</legend>
+          <div class="field" data-field="email">
+            <label for="b-email">Email</label>
+            <input id="b-email" name="email" type="email" autocomplete="email" required>
+            <div class="error-msg">Enter a valid email address.</div>
+          </div>
+          <div class="field" data-field="phone">
+            <label for="b-phone">Phone number</label>
+            <input id="b-phone" name="phone" type="tel" placeholder="e.g. 0973610491" autocomplete="tel" required>
+            <div class="error-msg">Enter a valid phone number.</div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Location</legend>
+          <div class="field" data-field="country">
+            <label for="b-country">Country</label>
+            <select id="b-country" name="country" required>
+              <option value="Zambia">Zambia</option>
+              <option value="Zimbabwe">Zimbabwe</option>
+              <option value="South Africa">South Africa</option>
+              <option value="Malawi">Malawi</option>
+              <option value="Tanzania">Tanzania</option>
+              <option value="DRC">DR Congo</option>
+              <option value="Kenya">Kenya</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field" data-field="province">
+              <label for="b-province">Province</label>
+              <select id="b-province" name="provinceSelect"></select>
+              <input id="b-province-text" name="province" type="text" placeholder="Province/Region" style="display:none; margin-top:8px;">
+            </div>
+            <div class="field" data-field="district">
+              <label for="b-district">District</label>
+              <input id="b-district" name="district" type="text" required>
+              <div class="error-msg">Enter your district.</div>
+            </div>
+          </div>
+          <div class="field" data-field="address">
+            <label for="b-address">Physical address</label>
+            <input id="b-address" name="address" type="text" required>
+            <div class="error-msg">Enter your physical address.</div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Talent category</legend>
+          <div class="field" data-field="category">
+            <label for="b-category">Primary category</label>
+            <select id="b-category" name="category" required>
+              <option value="">Select a category</option>
+              <option>Music</option><option>Poetry &amp; Spoken Word</option><option>Writing</option>
+              <option>Acting &amp; Film</option><option>Public Speaking</option><option>Baking &amp; Catering</option>
+              <option>Design</option><option>Photography</option><option>Visual Art</option><option>Other</option>
+            </select>
+            <div class="error-msg">Choose a category.</div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Security</legend>
+          <div class="field" data-field="password">
+            <label for="b-password">Password</label>
+            <div class="pw-wrap">
+              <input id="b-password" name="password" type="password" autocomplete="new-password" minlength="6" required>
+              <button type="button" class="pw-toggle" data-toggle-pw="b-password">SHOW</button>
+            </div>
+            <div class="hint">At least 6 characters.</div>
+            <div class="error-msg">Password must be at least 6 characters.</div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Subscription</legend>
+          <div class="field" data-field="paymentMethod">
+            <label for="b-payment">Preferred payment method</label>
+            <select id="b-payment" name="paymentMethod" required>
+              <option value="mobile_money">Mobile Money</option>
+              <option value="bank_card">Bank Card</option>
+              <option value="bank_account">Bank Account</option>
+            </select>
+            <div class="hint">Builder subscription is K62.50/month. Payments aren\u2019t wired up yet, so you\u2019ll get full access as a trial Builder while that\u2019s being built — no charge happens today.</div>
+          </div>
+        </fieldset>
+
+        <button class="btn btn-primary" type="submit" id="btn-register-builder">
+          <span class="btn-spinner"></span><span class="btn-label">Create Builder account</span>
+        </button>
+        <div class="foot-note">Already have an account?
+          <button type="button" data-nav="#/login">Log in</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- REGISTER: COMMUNITY -->
+  <section class="screen" id="screen-register-community">
+    <div class="topbar">
+      <button class="back" data-nav="#/welcome" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2>Community Registration</h2>
+    </div>
+    <div class="screen-body">
+      <form id="form-register-community" novalidate>
+        <div class="field" data-field="name">
+          <label for="c-name">Full name</label>
+          <input id="c-name" name="name" type="text" autocomplete="name" required>
+          <div class="error-msg">Enter your full name.</div>
+        </div>
+        <div class="field" data-field="email">
+          <label for="c-email">Email</label>
+          <input id="c-email" name="email" type="email" autocomplete="email" required>
+          <div class="error-msg">Enter a valid email address.</div>
+        </div>
+        <div class="field" data-field="phone">
+          <label for="c-phone">Phone number</label>
+          <input id="c-phone" name="phone" type="tel" placeholder="e.g. 0973610491" autocomplete="tel" required>
+          <div class="error-msg">Enter a valid phone number.</div>
+        </div>
+        <div class="field" data-field="country">
+          <label for="c-country">Country</label>
+          <select id="c-country" name="country" required>
+            <option value="Zambia">Zambia</option>
+            <option value="Zimbabwe">Zimbabwe</option>
+            <option value="South Africa">South Africa</option>
+            <option value="Malawi">Malawi</option>
+            <option value="Tanzania">Tanzania</option>
+            <option value="DRC">DR Congo</option>
+            <option value="Kenya">Kenya</option>
+            <option value="Nigeria">Nigeria</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field" data-field="province">
+            <label for="c-province">Province</label>
+            <select id="c-province" name="provinceSelect"></select>
+            <input id="c-province-text" name="province" type="text" placeholder="Province/Region" style="display:none; margin-top:8px;">
+          </div>
+          <div class="field" data-field="district">
+            <label for="c-district">District</label>
+            <input id="c-district" name="district" type="text" required>
+            <div class="error-msg">Enter your district.</div>
+          </div>
+        </div>
+        <div class="field" data-field="address">
+          <label for="c-address">Physical address</label>
+          <input id="c-address" name="address" type="text" required>
+          <div class="error-msg">Enter your physical address.</div>
+        </div>
+        <div class="field" data-field="password">
+          <label for="c-password">Password</label>
+          <div class="pw-wrap">
+            <input id="c-password" name="password" type="password" autocomplete="new-password" minlength="6" required>
+            <button type="button" class="pw-toggle" data-toggle-pw="c-password">SHOW</button>
+          </div>
+          <div class="hint">At least 6 characters.</div>
+          <div class="error-msg">Password must be at least 6 characters.</div>
+        </div>
+        <button class="btn btn-maroon" type="submit" id="btn-register-community">
+          <span class="btn-spinner"></span><span class="btn-label">Create Community account</span>
+        </button>
+        <div class="foot-note">Already have an account?
+          <button type="button" data-nav="#/login">Log in</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- LOGIN -->
+  <section class="screen" id="screen-login">
+    <div class="topbar">
+      <button class="back" data-nav="#/welcome" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2>Log in</h2>
+    </div>
+    <div class="screen-body">
+      <form id="form-login" novalidate>
+        <div class="field" data-field="identifier">
+          <label for="l-identifier">Email or phone number</label>
+          <input id="l-identifier" name="identifier" type="text" autocomplete="username" required>
+          <div class="error-msg">Enter your email or phone number.</div>
+        </div>
+        <div class="field" data-field="password">
+          <label for="l-password">Password</label>
+          <div class="pw-wrap">
+            <input id="l-password" name="password" type="password" autocomplete="current-password" required>
+            <button type="button" class="pw-toggle" data-toggle-pw="l-password">SHOW</button>
+          </div>
+          <div class="error-msg">Enter your password.</div>
+        </div>
+        <div class="row-between">
+          <label class="checkbox-row"><input type="checkbox" id="l-remember" checked> Remember me</label>
+          <button type="button" class="btn-link" data-nav="#/forgot">Forgot password?</button>
+        </div>
+        <button class="btn btn-primary" type="submit" id="btn-login">
+          <span class="btn-spinner"></span><span class="btn-label">Log in</span>
+        </button>
+        <div class="foot-note">New to IT'S DOABLE! TALENT?
+          <button type="button" data-nav="#/welcome">Create an account</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- FORGOT PASSWORD -->
+  <section class="screen" id="screen-forgot">
+    <div class="topbar">
+      <button class="back" data-nav="#/login" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2>Reset password</h2>
+    </div>
+    <div class="screen-body">
+      <p style="color:var(--ink-soft); font-size:14px; margin-bottom:18px; line-height:1.5;">Enter the email linked to your account. We'll send a link to reset your password.</p>
+      <form id="form-forgot" novalidate>
+        <div class="field" data-field="email">
+          <label for="f-email">Email</label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required>
+          <div class="error-msg">Enter a valid email address.</div>
+        </div>
+        <button class="btn btn-primary" type="submit" id="btn-forgot">
+          <span class="btn-spinner"></span><span class="btn-label">Send reset link</span>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- BUILDER PENDING SUBSCRIPTION -->
+  <section class="screen" id="screen-pending">
+    <div class="topbar"><h2>Almost there</h2></div>
+    <div class="screen-body">
+      <div class="status-panel">
+        <div class="badge">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 8v5l3 2" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8"/></svg>
+        </div>
+        <h3>Your Builder account is created</h3>
+        <p>One step left: activate your subscription (K62.50/month) to unlock your Builder Dashboard, Wallet, Market, and Academy. Payment collection is being wired up in the next build phase — for now your details are safely saved.</p>
+        <div class="kv-list">
+          <div class="kv-row"><span>Brand name</span><span id="pending-brand">—</span></div>
+          <div class="kv-row"><span>Payment method</span><span id="pending-method">—</span></div>
+          <div class="kv-row"><span>Status</span><span id="pending-status">Pending payment</span></div>
+        </div>
+      </div>
+      <button class="btn btn-outline signout-btn" id="btn-pending-signout" style="margin:20px 0 0;">Log out</button>
+    </div>
+  </section>
+
+  <!-- BUILDER DASHBOARD -->
+  <section class="screen has-bottom-nav" id="screen-builder-dashboard">
+    <div class="home-hero">
+      <div class="hello">Welcome back</div>
+      <h2 id="bd-brand">—</h2>
+      <span class="role-chip">Builder</span>
+      <span class="sub-chip" id="bd-sub-chip">—</span>
+    </div>
+    <div class="screen-body">
+      <div class="dash-grid">
+        <button class="dash-card" data-nav="#/profile">
+          <span class="dash-ic teal">👤</span><strong>Profile</strong>
+        </button>
+        <button class="dash-card" data-nav="#/wallet">
+          <span class="dash-ic gold">💰</span><strong>Wallet</strong>
+        </button>
+        <button class="dash-card" data-nav="#/soon?title=Builder+Community&body=See+your+followers%2C+growth%2C+and+top+supporters+here+once+the+Builder+Community+module+is+built.">
+          <span class="dash-ic maroon">👥</span><strong>Community</strong>
+        </button>
+        <button class="dash-card" data-nav="#/builder-market">
+          <span class="dash-ic teal">🛍️</span><strong>Market</strong>
+        </button>
+        <button class="dash-card" data-nav="#/soon?title=Builder+Academy&body=Courses+on+branding%2C+marketing%2C+leadership%2C+finance+and+more+are+coming+soon.">
+          <span class="dash-ic gold">🎓</span><strong>Academy</strong>
+        </button>
+        <button class="dash-card" data-nav="#/archive">
+          <span class="dash-ic maroon">🗂️</span><strong>Archive</strong>
+        </button>
+        <button class="dash-card" data-nav="#/soon?title=Builder+Journey&body=Track+your+progress+across+the+Eight+Builder+Pillars+here+once+this+module+is+built.">
+          <span class="dash-ic teal">🧭</span><strong>Journey</strong>
+        </button>
+        <button class="dash-card" data-nav="#/soon?title=Notifications&body=Bookings%2C+tips%2C+sales+and+community+activity+will+appear+here.">
+          <span class="dash-ic gold">🔔</span><strong>Notifications</strong>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY DASHBOARD -->
+  <section class="screen has-bottom-nav" id="screen-community-dashboard">
+    <div class="home-hero">
+      <div class="hello">Welcome back</div>
+      <h2 id="cd-name">—</h2>
+      <span class="role-chip">Community</span>
+    </div>
+    <div class="screen-body">
+      <div class="dash-grid">
+        <button class="dash-card" data-nav="#/profile">
+          <span class="dash-ic teal">👤</span><strong>Profile</strong>
+        </button>
+        <button class="dash-card" data-nav="#/wallet">
+          <span class="dash-ic gold">💰</span><strong>Wallet</strong>
+        </button>
+        <button class="dash-card" data-nav="#/discover">
+          <span class="dash-ic maroon">🔎</span><strong>Discover Builders</strong>
+        </button>
+        <button class="dash-card" data-nav="#/joined-communities">
+          <span class="dash-ic teal">🌐</span><strong>Joined Communities</strong>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCOVER BUILDERS -->
+  <section class="screen has-bottom-nav" id="screen-discover">
+    <div class="topbar"><h2>Explore</h2></div>
+    <div class="screen-body">
+      <div class="tab-row">
+        <button class="tab-btn active" data-discover-tab="foryou">For You</button>
+        <button class="tab-btn" data-discover-tab="builders">Builders</button>
+      </div>
+
+      <div id="discover-panel-foryou">
+        <div id="foryou-feed-list"></div>
+        <button class="btn btn-outline" id="btn-load-more-feed" style="margin-top:6px; display:none;">Load more</button>
+      </div>
+
+      <div id="discover-panel-builders" style="display:none;">
+        <div class="field" style="margin-bottom:14px;">
+          <input id="discover-search" type="text" placeholder="Search by brand name, category, or district">
+        </div>
+        <div id="discover-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOINED COMMUNITIES -->
+  <section class="screen has-bottom-nav" id="screen-joined-communities">
+    <div class="topbar">
+      <button class="back" data-nav="#/community-dashboard" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2>Joined Communities</h2>
+    </div>
+    <div class="screen-body">
+      <div id="joined-communities-list"></div>
+    </div>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="screen has-bottom-nav" id="screen-profile">
+    <div class="topbar"><h2>Profile</h2></div>
+    <div class="screen-body">
+      <div class="profile-photo-row">
+        <div class="avatar-lg" id="profile-avatar">?</div>
+        <button class="btn btn-outline" id="btn-edit-profile" data-nav="#/edit-profile">Edit profile</button>
+      </div>
+      <div class="status-panel" style="text-align:left;">
+        <div class="kv-list" style="border-top:none; padding-top:0;" id="profile-kv"></div>
+      </div>
+      <button class="btn btn-outline signout-btn" id="btn-profile-signout">Log out</button>
+    </div>
+  </section>
+
+  <!-- EDIT PROFILE -->
+  <section class="screen has-bottom-nav" id="screen-edit-profile">
+    <div class="topbar">
+      <button class="back" data-nav="#/profile" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2>Edit profile</h2>
+    </div>
+    <div class="screen-body">
+      <form id="form-edit-profile" novalidate>
+        <div class="upload-field">
+          <label>Profile photo</label>
+          <div class="upload-preview-row">
+            <div class="avatar-lg" id="ep-photo-preview">?</div>
+            <label class="btn btn-outline upload-btn">
+              Choose photo
+              <input type="file" id="ep-photo-input" accept="image/*" hidden>
+            </label>
+          </div>
+          <div class="hint">JPG or PNG. Will be resized automatically.</div>
+        </div>
+
+        <div class="upload-field" id="ep-cover-field">
+          <label>Cover photo</label>
+          <div class="cover-preview" id="ep-cover-preview">No cover photo yet</div>
+          <label class="btn btn-outline upload-btn">
+            Choose cover photo
+            <input type="file" id="ep-cover-input" accept="image/*" hidden>
+          </label>
+        </div>
+
+        <div class="field" id="ep-bio-field">
+          <label for="ep-bio">Bio</label>
+          <textarea id="ep-bio" rows="4" placeholder="Tell Community what you build…" maxlength="400"></textarea>
+        </div>
+
+        <button class="btn btn-primary" type="submit" id="btn-save-profile">
+          <span class="btn-spinner"></span><span class="btn-label">Save changes</span>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- BUILDER MARKET (owner: manage; viewer: browse) -->
+  <section class="screen has-bottom-nav" id="screen-builder-market">
+    <div class="topbar">
+      <button class="back" onclick="history.back()" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div style="flex:1;">
+        <h2 id="bm-title">Builder Market</h2>
+        <div class="presence-text" id="bm-presence" style="display:none;"></div>
+      </div>
+      <div class="more-wrap" id="bm-more-wrap" style="display:none;">
+        <button class="more-btn" aria-label="More options">⋯</button>
+        <div class="more-menu"></div>
+      </div>
+    </div>
+    <div class="market-join-bar" id="market-join-bar" style="display:none;">
+      <span id="market-join-status">Not joined</span>
+      <button class="btn btn-primary" id="btn-toggle-join" type="button">Join Community</button>
+    </div>
+    <div class="screen-body">
+      <div class="tab-row">
+        <button class="tab-btn active" data-market-tab="updates">Updates</button>
+        <button class="tab-btn" data-market-tab="products">Products</button>
+        <button class="tab-btn" data-market-tab="testimonials">Testimonials</button>
+        <button class="tab-btn" data-market-tab="live">Live</button>
+      </div>
+
+      <div id="bm-panel-updates">
+        <button class="btn btn-maroon" id="btn-post-update" style="margin-bottom:16px; display:none;">+ Post an update</button>
+        <div id="cv-form-wrap" style="display:none; margin-bottom:18px;">
+          <form id="form-community-value">
+            <div class="field">
+              <label for="cv-type">Type</label>
+              <select id="cv-type">
+                <option value="text">Text update</option>
+                <option value="image">Photo</option>
+                <option value="video">Video</option>
+                <option value="audio">Music / audio</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cv-caption">Caption</label>
+              <textarea id="cv-caption" rows="2" placeholder="What do you want Community to know?" maxlength="300" required></textarea>
+              <div class="error-msg">Write a caption.</div>
+            </div>
+            <div class="upload-field" id="cv-file-field">
+              <div class="hint" id="cv-file-name">No file chosen</div>
+              <label class="btn btn-outline upload-btn">
+                Choose file
+                <input type="file" id="cv-file-input" hidden>
+              </label>
+              <div class="upload-progress" id="cv-progress" style="display:none;">
+                <div class="upload-progress-bar" id="cv-progress-bar"></div>
+              </div>
+              <div class="error-msg">Choose a file for this update.</div>
+            </div>
+            <button class="btn btn-primary" type="submit" id="btn-post-community-value">
+              <span class="btn-spinner"></span><span class="btn-label">Post</span>
+            </button>
+          </form>
+        </div>
+        <div id="community-value-list"></div>
+      </div>
+
+      <div id="bm-panel-products" style="display:none;">
+        <button class="btn btn-maroon" id="btn-add-product-nav" data-nav="#/add-product" style="margin-bottom:16px; display:none;">+ Add product</button>
+        <div id="bm-list"></div>
+      </div>
+
+      <div id="bm-panel-testimonials" style="display:none;">
+        <div id="bm-testimonial-form-wrap" style="display:none; margin-bottom:18px;">
+          <form id="form-testimonial">
+            <div class="field">
+              <label for="ts-text">Leave a testimonial</label>
+              <textarea id="ts-text" rows="3" placeholder="Share your experience with this Builder…" maxlength="500" required></textarea>
+            </div>
+            <div class="upload-field">
+              <div class="cover-preview" id="ts-photo-preview" style="height:80px;">No photo added</div>
+              <label class="btn btn-outline upload-btn">
+                Add a photo (optional)
+                <input type="file" id="ts-photo-input" accept="image/*" hidden>
+              </label>
+            </div>
+            <button class="btn btn-primary" type="submit" id="btn-submit-testimonial">
+              <span class="btn-spinner"></span><span class="btn-label">Post testimonial</span>
+            </button>
+          </form>
+        </div>
+        <div id="testimonial-list"></div>
+      </div>
+
+      <div id="bm-panel-live" style="display:none;">
+        <div class="status-panel">
+          <div class="badge"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 8v8l6-4-6-4Z" fill="#fff"/><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8"/></svg></div>
+          <h3>Live sessions — coming soon</h3>
+          <p>Real live streaming needs dedicated video infrastructure (Cloudflare Stream Live, Mux, or similar) — Cloudflare R2 only stores files, it doesn't handle live video ingest. Rather than fake this, it's being built properly once a streaming provider is chosen.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ADD PRODUCT -->
+  <section class="screen has-bottom-nav" id="screen-add-product">
+    <div class="topbar">
+      <button class="back" data-nav="#/builder-market" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2>Add product</h2>
+    </div>
+    <div class="screen-body">
+      <form id="form-add-product" novalidate>
+        <div class="field" data-field="title">
+          <label for="ap-title">Title</label>
+          <input id="ap-title" type="text" required>
+          <div class="error-msg">Enter a title.</div>
+        </div>
+        <div class="field" data-field="description">
+          <label for="ap-description">Description</label>
+          <textarea id="ap-description" rows="3"></textarea>
+        </div>
+        <div class="field" data-field="category">
+          <label for="ap-category">Category</label>
+          <select id="ap-category" required>
+            <option value="">Select a category</option>
+            <option>Music</option><option>Merchandise</option><option>Bookings</option>
+            <option>Courses</option><option>Tickets</option><option>Digital Products</option>
+            <option>Books / eBooks</option><option>Other</option>
+          </select>
+          <div class="error-msg">Choose a category.</div>
+        </div>
+        <div class="field" data-field="price">
+          <label for="ap-price">Price (ZMW)</label>
+          <input id="ap-price" type="number" min="0" step="0.5" required>
+          <div class="error-msg">Enter a valid price (0 or more).</div>
+        </div>
+        <div class="upload-field">
+          <label>Cover image</label>
+          <div class="cover-preview" id="ap-cover-preview">No cover image yet</div>
+          <label class="btn btn-outline upload-btn">
+            Choose cover image
+            <input type="file" id="ap-cover-input" accept="image/*" hidden>
+          </label>
+        </div>
+        <label class="checkbox-row" style="margin:6px 0 14px;">
+          <input type="checkbox" id="ap-isdigital"> This is a digital download (music, video, PDF/book, etc.)
+        </label>
+        <div class="upload-field" id="ap-file-field" style="display:none;">
+          <label>Digital file</label>
+          <div class="hint" id="ap-file-name">No file chosen</div>
+          <label class="btn btn-outline upload-btn">
+            Choose file
+            <input type="file" id="ap-file-input" accept="audio/*,video/*,application/pdf,image/*" hidden>
+          </label>
+          <div class="upload-progress" id="ap-progress" style="display:none;">
+            <div class="upload-progress-bar" id="ap-progress-bar"></div>
+          </div>
+          <div class="hint">Audio/PDF up to 20MB, video up to 50MB. Downloads unlock once Payments (Phase coming) is live — for now this stores the file securely.</div>
+        </div>
+        <button class="btn btn-primary" type="submit" id="btn-add-product">
+          <span class="btn-spinner"></span><span class="btn-label">Publish product</span>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- WALLET (real balance, both roles) -->
+  <section class="screen has-bottom-nav" id="screen-wallet">
+    <div class="topbar"><h2 id="wallet-title">Wallet</h2></div>
+    <div class="screen-body">
+      <div class="wallet-balance-card">
+        <div class="wb-label">Available balance</div>
+        <div class="wb-amount" id="wallet-balance">K0.00</div>
+        <div class="wb-currency">ZMW</div>
+      </div>
+      <div class="field-row" style="margin-top:16px;">
+        <button class="btn btn-primary" disabled title="Coming in the Wallets &amp; Payments phase">Withdraw</button>
+        <button class="btn btn-outline" disabled title="Coming in the Wallets &amp; Payments phase">Top Up</button>
+      </div>
+      <div class="status-panel" style="margin-top:20px;">
+        <h3>No transactions yet</h3>
+        <p>Sales, tips, bookings, and withdrawals will show up here once the Payments module is live.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUILDER ARCHIVE (personal media library — private) -->
+  <section class="screen has-bottom-nav" id="screen-archive">
+    <div class="topbar">
+      <button class="back" onclick="history.back()" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2>My Archive</h2>
+    </div>
+    <div class="screen-body">
+      <button class="btn btn-maroon" data-nav="#/archive-upload" style="margin-bottom:16px;">+ Upload photo, video, or music</button>
+      <div class="chip-row" id="archive-filter">
+        <button class="chip active" data-kind="all">All</button>
+        <button class="chip" data-kind="image">Photos</button>
+        <button class="chip" data-kind="video">Videos</button>
+        <button class="chip" data-kind="audio">Music</button>
+      </div>
+      <div id="archive-list"></div>
+    </div>
+  </section>
+
+  <!-- ARCHIVE UPLOAD -->
+  <section class="screen has-bottom-nav" id="screen-archive-upload">
+    <div class="topbar">
+      <button class="back" data-nav="#/archive" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2>Upload to Archive</h2>
+    </div>
+    <div class="screen-body">
+      <form id="form-archive-upload" novalidate>
+        <div class="field" data-field="title">
+          <label for="av-title">Title</label>
+          <input id="av-title" type="text" placeholder="e.g. Studio session, Album cover, Live clip" required>
+          <div class="error-msg">Give it a title.</div>
+        </div>
+        <div class="upload-field" data-field="file">
+          <label>File</label>
+          <div class="hint" id="av-file-name">No file chosen</div>
+          <label class="btn btn-outline upload-btn">
+            Choose photo, video, or music file
+            <input type="file" id="av-file-input" accept="image/*,video/*,audio/*" hidden>
+          </label>
+          <div class="upload-progress" id="av-progress" style="display:none;">
+            <div class="upload-progress-bar" id="av-progress-bar"></div>
+          </div>
+          <div class="hint">Images/audio up to 20MB, video up to 60MB. This is your private library — only you can see these files.</div>
+          <div class="error-msg">Choose a file to upload.</div>
+        </div>
+        <button class="btn btn-primary" type="submit" id="btn-archive-upload">
+          <span class="btn-spinner"></span><span class="btn-label">Save to Archive</span>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- GENERIC COMING SOON -->
+  <section class="screen has-bottom-nav" id="screen-soon">
+    <div class="topbar">
+      <button class="back" onclick="history.back()" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="#121212" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2 id="soon-title">Coming soon</h2>
+    </div>
+    <div class="screen-body">
+      <div class="status-panel">
+        <div class="badge"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 6v6l4 2" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.8"/></svg></div>
+        <h3 id="soon-heading">Coming soon</h3>
+        <p id="soon-body">This part of the platform is being built next.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM NAV (shown on all authenticated app screens) -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="nav-item" data-nav-slot="home">
+      <span class="nav-ic">🏛️</span><span>Home</span>
+    </button>
+    <button class="nav-item" data-nav-slot="secondary">
+      <span class="nav-ic">👥</span><span id="nav-secondary-label">Community</span>
+    </button>
+    <button class="nav-item" data-nav-slot="wallet">
+      <span class="nav-ic">💰</span><span>Wallet</span>
+    </button>
+    <button class="nav-item" data-nav-slot="profile">
+      <span class="nav-ic">👤</span><span>Profile</span>
+    </button>
+  </nav>
+
+</div>
+
+<div id="toast-host"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  onAuthStateChanged, sendPasswordResetEmail, signOut,
+  setPersistence, browserLocalPersistence, browserSessionPersistence
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, updateDoc, deleteDoc, getDoc, serverTimestamp,
+  collection, query, where, getDocs, limit, increment, runTransaction,
+  orderBy, startAfter
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+// ---------- Firebase init ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyCw0oc0ttzyk-54Vaxexiv3Q9soG7DmPUo",
+  authDomain: "grok-4.firebaseapp.com",
+  projectId: "grok-4",
+  storageBucket: "grok-4.firebasestorage.app",
+  messagingSenderId: "790296418601",
+  appId: "1:790296418601:web:2ae6bce0591cbd6fa47f38",
+  measurementId: "G-TE3GVW016L"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ---------- Media backend (Cloudflare R2 via presigned URLs) ----------
+// Firebase Storage isn't used — media (images/audio/video/PDFs) is stored
+// in Cloudflare R2 instead, fronted by a small presigned-upload API so R2
+// credentials never touch the browser. Point this at your deployed
+// r2-media-api service (see /r2-media-api in this project).
+const MEDIA_API_BASE = "https://it-s-doable.onrender.com";
+
+// ---------- Register service worker ----------
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+// ---------- Small utilities ----------
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
+// Turns a caught error into something the user can actually act on — a
+// generic "please try again" hides whether it was a network/CORS problem,
+// an expired sign-in, or the media backend being unreachable, all of which
+// need different fixes.
+function uploadErrorMessage(err, fallback) {
+  const msg = (err && err.message) || '';
+  if (err && err.name === 'TypeError' && /fetch/i.test(msg)) {
+    return 'Couldn\u2019t reach the media server (network or CORS issue). Check your connection and try again.';
+  }
+  // Never surface a raw JS runtime error (e.g. "Cannot read properties of
+  // null...") to the user — that's an implementation bug to fix, not
+  // something a Builder or Community member can act on. Log it for
+  // debugging, show the friendly fallback instead. Anything that ISN'T a
+  // raw TypeError is presumed to be a message we deliberately authored
+  // ourselves (e.g. `throw new Error('This phone number is already registered.')`)
+  // and is safe to show as-is.
+  if (err && err.name === 'TypeError') {
+    console.error('Unexpected TypeError (not shown to user):', err);
+    return fallback;
+  }
+  if (/not signed in/i.test(msg)) return 'Your session expired — please log in again.';
+  if (msg) return msg;
+  return fallback;
+}
+
+function toast(message, type = 'info', ms = 3600) {
+  const host = $('#toast-host');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = message;
+  host.appendChild(el);
+  setTimeout(() => el.remove(), ms);
+}
+
+// ---------- Presence ("online now") ----------
+// Deliberately NOT a realtime listener — at thousands of concurrent users,
+// onSnapshot on presence data gets expensive fast. Instead: a Builder's own
+// device pings its lastActiveAt every ~90s while the tab is actually
+// visible (paused when backgrounded via the Page Visibility API), and
+// anyone viewing that Builder's profile/card just reads that one field
+// off the user doc they already fetched. "Online" = pinged within the
+// last 2 minutes. Good enough for a presence dot; not meant to be exact
+// to the second. If this needs to feel more instant later, Firebase
+// Realtime Database's built-in onDisconnect is the right upgrade path.
+const PRESENCE_ONLINE_WINDOW_SECONDS = 120;
+const PRESENCE_HEARTBEAT_MS = 90000;
+let presenceHeartbeatId = null;
+
+function isRecentlyActive(lastActiveAt) {
+  if (!lastActiveAt || !lastActiveAt.seconds) return false;
+  return (Date.now() / 1000 - lastActiveAt.seconds) < PRESENCE_ONLINE_WINDOW_SECONDS;
+}
+
+async function pingPresence() {
+  if (!currentUid || document.visibilityState !== 'visible') return;
+  try {
+    await updateDoc(doc(db, 'users', currentUid), { lastActiveAt: serverTimestamp() });
+  } catch (err) {
+    // Non-critical — a missed heartbeat just means the dot goes gray a bit early.
+    console.warn('Presence ping failed', err.message);
+  }
+}
+
+function startPresenceHeartbeat() {
+  stopPresenceHeartbeat();
+  pingPresence();
+  presenceHeartbeatId = setInterval(pingPresence, PRESENCE_HEARTBEAT_MS);
+}
+function stopPresenceHeartbeat() {
+  if (presenceHeartbeatId) { clearInterval(presenceHeartbeatId); presenceHeartbeatId = null; }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') pingPresence();
+});
+
+function setLoading(btn, isLoading) {
+  if (!btn) return;
+  btn.classList.toggle('loading', isLoading);
+  btn.disabled = isLoading;
+}
+
+function showScreen(id) {
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function fieldError(fieldEl, message) {
+  fieldEl.classList.add('error');
+  if (message) $('.error-msg', fieldEl).textContent = message;
+}
+function fieldOk(fieldEl) {
+  fieldEl.classList.remove('error');
+}
+function clearErrors(form) {
+  $$('.field', form).forEach(fieldOk);
+}
+
+// ---------- Media upload helpers (Cloudflare R2 via presigned URLs) ----------
+// Images are resized/compressed client-side before upload (keeps R2
+// storage/bandwidth costs and Community data usage down). Audio/video/pdf
+// go up as-is, with a hard size cap enforced before the network call even
+// starts. The browser never sees an R2 credential — it asks MEDIA_API_BASE
+// for a short-lived presigned PUT URL (proving identity with its Firebase
+// ID token) and uploads directly to R2 with that URL.
+function compressImageFile(file, maxDim = 1000, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) { height = Math.round(height * (maxDim / width)); width = maxDim; }
+        else { width = Math.round(width * (maxDim / height)); height = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        URL.revokeObjectURL(url);
+        if (!blob) return reject(new Error('Could not process image.'));
+        resolve(blob);
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read image file.')); };
+    img.src = url;
+  });
+}
+
+async function getIdToken() {
+  if (!auth.currentUser) throw new Error('Not signed in.');
+  return auth.currentUser.getIdToken();
+}
+
+async function presignUpload(key, contentType, sizeBytes) {
+  const token = await getIdToken();
+  const res = await fetch(`${MEDIA_API_BASE}/api/r2/presign-upload`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ key, contentType, sizeBytes })
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || 'Could not get an upload link. Please try again.');
+  }
+  return res.json(); // { uploadUrl, publicUrl, key }
+}
+
+function putToR2WithProgress(uploadUrl, blob, contentType, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', uploadUrl);
+    xhr.setRequestHeader('Content-Type', contentType);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300)
+      ? resolve()
+      : reject(new Error(`Upload failed (${xhr.status}).`));
+    xhr.onerror = () => reject(new Error('Network error during upload.'));
+    xhr.send(blob);
+  });
+}
+
+async function uploadCompressedImage(file, key, maxDim = 1000, quality = 0.82) {
+  const blob = await compressImageFile(file, maxDim, quality);
+  const { uploadUrl, publicUrl } = await presignUpload(key, 'image/jpeg', blob.size);
+  await putToR2WithProgress(uploadUrl, blob, 'image/jpeg');
+  return { path: key, url: publicUrl };
+}
+
+async function uploadRawFileWithProgress(file, key, onProgress) {
+  const contentType = file.type || 'application/octet-stream';
+  const { uploadUrl, publicUrl } = await presignUpload(key, contentType, file.size);
+  await putToR2WithProgress(uploadUrl, file, contentType, onProgress);
+  return { path: key, url: publicUrl };
+}
+
+async function deleteFromR2(key) {
+  const token = await getIdToken();
+  const res = await fetch(`${MEDIA_API_BASE}/api/r2/delete`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ key })
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || 'Could not delete that file.');
+  }
+}
+
+async function presignDownload(key) {
+  const token = await getIdToken();
+  const res = await fetch(`${MEDIA_API_BASE}/api/r2/presign-download`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ key })
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || 'Could not open that file.');
+  }
+  const { downloadUrl } = await res.json();
+  return downloadUrl;
+}
+
+const FILE_LIMITS = {
+  image: 5 * 1024 * 1024,
+  audio: 20 * 1024 * 1024,
+  video: 50 * 1024 * 1024,
+  application: 20 * 1024 * 1024
+};
+
+function checkFileSize(file) {
+  const kind = (file.type || '').split('/')[0];
+  const limit = FILE_LIMITS[kind] || FILE_LIMITS.application;
+  return file.size <= limit ? null : `File is too large. Limit is ${Math.round(limit / (1024 * 1024))}MB for this file type.`;
+}
+
+const ZAMBIA_PROVINCES = [
+  "Central", "Copperbelt", "Eastern", "Luapula", "Lusaka",
+  "Muchinga", "Northern", "North-Western", "Southern", "Western"
+];
+
+function wireCountryProvince(prefix) {
+  const country = $(`#${prefix}-country`);
+  const provinceSelect = $(`#${prefix}-province`);
+  const provinceText = $(`#${prefix}-province-text`);
+
+  function render() {
+    if (country.value === 'Zambia') {
+      provinceSelect.innerHTML = ZAMBIA_PROVINCES.map(p => `<option>${p}</option>`).join('');
+      provinceSelect.style.display = '';
+      provinceText.style.display = 'none';
+      provinceText.value = '';
+    } else {
+      provinceSelect.innerHTML = '';
+      provinceSelect.style.display = 'none';
+      provinceText.style.display = '';
+    }
+  }
+  country.addEventListener('change', render);
+  render();
+}
+wireCountryProvince('b');
+wireCountryProvince('c');
+
+function getProvinceValue(prefix) {
+  const sel = $(`#${prefix}-province`);
+  const txt = $(`#${prefix}-province-text`);
+  return sel.style.display === 'none' ? txt.value.trim() : sel.value;
+}
+
+// Password show/hide
+$$('[data-toggle-pw]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById(btn.dataset.togglePw);
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    btn.textContent = show ? 'HIDE' : 'SHOW';
+  });
+});
+
+// Generic nav buttons
+document.addEventListener('click', (e) => {
+  const trigger = e.target.closest('[data-nav]');
+  if (trigger) window.location.hash = trigger.dataset.nav;
+});
+
+function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+function isValidPhone(v) { return /^[0-9+()\-\s]{7,15}$/.test(v); }
+function normalizePhone(v) { return v.replace(/[^\d+]/g, ''); }
+
+function friendlyAuthError(err) {
+  const code = err && err.code || '';
+  const map = {
+    'auth/email-already-in-use': 'That email is already registered. Try logging in instead.',
+    'auth/invalid-email': 'That email address doesn\u2019t look right. Please check it and try again.',
+    'auth/weak-password': 'Please choose a password with at least 6 characters.',
+    'auth/user-not-found': 'We couldn\u2019t find an account with those details.',
+    'auth/wrong-password': 'That password doesn\u2019t match. Please try again.',
+    'auth/invalid-credential': 'Email/phone or password is incorrect. Please try again.',
+    'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
+    'auth/network-request-failed': 'Network issue — check your connection and try again.'
+  };
+  return map[code] || 'Something went wrong. Please try again.';
+}
+
+// ---------- Uniqueness check ----------
+// A dedicated public phone->email/uid index. Registration and phone-login
+// both need to resolve a phone number BEFORE the user is signed in, but
+// the `users` collection requires isSignedIn() to read — hence this
+// separate, minimal, publicly-readable collection (no PII beyond the
+// phone-email/uid mapping itself).
+async function checkPhoneAvailable(phone) {
+  const snap = await getDoc(doc(db, 'phoneIndex', phone));
+  return !snap.exists();
+}
+
+async function claimPhoneIndex(phone, uid, email) {
+  await setDoc(doc(db, 'phoneIndex', phone), { uid, email, createdAt: serverTimestamp() });
+}
+
+// ---------- Registration: Builder ----------
+$('#form-register-builder').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  clearErrors(form);
+  const btn = $('#btn-register-builder');
+
+  const data = {
+    realName: $('#b-realName').value.trim(),
+    brandName: $('#b-brandName').value.trim(),
+    email: $('#b-email').value.trim(),
+    phone: normalizePhone($('#b-phone').value.trim()),
+    country: $('#b-country').value,
+    province: getProvinceValue('b'),
+    district: $('#b-district').value.trim(),
+    address: $('#b-address').value.trim(),
+    category: $('#b-category').value,
+    password: $('#b-password').value,
+    paymentMethod: $('#b-payment').value
+  };
+
+  let ok = true;
+  if (!data.realName) { fieldError(form.querySelector('[data-field=realName]')); ok = false; }
+  if (!data.brandName) { fieldError(form.querySelector('[data-field=brandName]')); ok = false; }
+  if (!isValidEmail(data.email)) { fieldError(form.querySelector('[data-field=email]')); ok = false; }
+  if (!isValidPhone(data.phone)) { fieldError(form.querySelector('[data-field=phone]')); ok = false; }
+  if (!data.district) { fieldError(form.querySelector('[data-field=district]')); ok = false; }
+  if (!data.address) { fieldError(form.querySelector('[data-field=address]')); ok = false; }
+  if (!data.category) { fieldError(form.querySelector('[data-field=category]')); ok = false; }
+  if (!data.password || data.password.length < 6) { fieldError(form.querySelector('[data-field=password]')); ok = false; }
+  if (!ok) { toast('Please fix the highlighted fields.', 'error'); return; }
+
+  setLoading(btn, true);
+  try {
+    if (!(await checkPhoneAvailable(data.phone))) {
+      fieldError(form.querySelector('[data-field=phone]'), 'This phone number is already registered.');
+      toast('That phone number is already in use.', 'error');
+      setLoading(btn, false);
+      return;
+    }
+
+    const cred = await createUserWithEmailAndPassword(auth, data.email, data.password);
+    const uid = cred.user.uid;
+
+    await claimPhoneIndex(data.phone, uid, data.email);
+
+    const newUserDoc = {
+      uid, email: data.email, phone: data.phone, displayName: data.realName,
+      role: 'builder', country: data.country, province: data.province,
+      district: data.district, physicalAddress: data.address,
+      createdAt: serverTimestamp(), isActive: true, lastLogin: serverTimestamp(),
+      brandName: data.brandName, categories: [data.category], bio: '',
+      profileImageUrl: '', coverImageUrl: ''
+    };
+    await setDoc(doc(db, 'users', uid), newUserDoc);
+
+    await setDoc(doc(db, 'wallets', uid), {
+      userId: uid, balance: 0, currency: 'ZMW', updatedAt: serverTimestamp()
+    });
+
+    await setDoc(doc(db, 'subscriptions', uid), {
+      builderId: uid, status: 'trial', paymentMethod: data.paymentMethod,
+      startDate: null, endDate: null, lastPaymentDate: null, createdAt: serverTimestamp()
+    });
+
+    // onAuthStateChanged fires the instant createUserWithEmailAndPassword
+    // resolves — before this Firestore doc exists — so its own read of
+    // /users/{uid} comes back empty and currentUserDoc gets stuck at null,
+    // which is what was sending brand-new accounts back to the welcome
+    // screen instead of opening the dashboard. Set it here from the doc we
+    // just wrote so render() has what it needs immediately.
+    currentUid = uid;
+    currentUserDoc = newUserDoc;
+
+    toast('Builder account created!', 'success');
+    window.location.hash = '#/builder-dashboard';
+    render();
+  } catch (err) {
+    console.error(err);
+    if (err.code === 'auth/email-already-in-use') {
+      fieldError(form.querySelector('[data-field=email]'), 'This email is already registered.');
+    }
+    toast(friendlyAuthError(err), 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+// ---------- Registration: Community ----------
+$('#form-register-community').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  clearErrors(form);
+  const btn = $('#btn-register-community');
+
+  const data = {
+    name: $('#c-name').value.trim(),
+    email: $('#c-email').value.trim(),
+    phone: normalizePhone($('#c-phone').value.trim()),
+    country: $('#c-country').value,
+    province: getProvinceValue('c'),
+    district: $('#c-district').value.trim(),
+    address: $('#c-address').value.trim(),
+    password: $('#c-password').value
+  };
+
+  let ok = true;
+  if (!data.name) { fieldError(form.querySelector('[data-field=name]')); ok = false; }
+  if (!isValidEmail(data.email)) { fieldError(form.querySelector('[data-field=email]')); ok = false; }
+  if (!isValidPhone(data.phone)) { fieldError(form.querySelector('[data-field=phone]')); ok = false; }
+  if (!data.district) { fieldError(form.querySelector('[data-field=district]')); ok = false; }
+  if (!data.address) { fieldError(form.querySelector('[data-field=address]')); ok = false; }
+  if (!data.password || data.password.length < 6) { fieldError(form.querySelector('[data-field=password]')); ok = false; }
+  if (!ok) { toast('Please fix the highlighted fields.', 'error'); return; }
+
+  setLoading(btn, true);
+  try {
+    if (!(await checkPhoneAvailable(data.phone))) {
+      fieldError(form.querySelector('[data-field=phone]'), 'This phone number is already registered.');
+      toast('That phone number is already in use.', 'error');
+      setLoading(btn, false);
+      return;
+    }
+
+    const cred = await createUserWithEmailAndPassword(auth, data.email, data.password);
+    const uid = cred.user.uid;
+
+    await claimPhoneIndex(data.phone, uid, data.email);
+
+    const newUserDoc = {
+      uid, email: data.email, phone: data.phone, displayName: data.name,
+      role: 'community', country: data.country, province: data.province,
+      district: data.district, physicalAddress: data.address,
+      createdAt: serverTimestamp(), isActive: true, lastLogin: serverTimestamp(),
+      preferredCategories: [], walletId: uid
+    };
+    await setDoc(doc(db, 'users', uid), newUserDoc);
+
+    await setDoc(doc(db, 'wallets', uid), {
+      userId: uid, balance: 0, currency: 'ZMW', updatedAt: serverTimestamp()
+    });
+
+    // Same fix as builder registration — see comment there. Without this,
+    // onAuthStateChanged's own Firestore read (fired the moment sign-up
+    // resolves) beats this doc write and leaves currentUserDoc stuck null.
+    currentUid = uid;
+    currentUserDoc = newUserDoc;
+
+    toast('Welcome to the Community!', 'success');
+    window.location.hash = '#/community-dashboard';
+    render();
+  } catch (err) {
+    console.error(err);
+    if (err.code === 'auth/email-already-in-use') {
+      fieldError(form.querySelector('[data-field=email]'), 'This email is already registered.');
+    }
+    toast(friendlyAuthError(err), 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+// ---------- Login (email or phone) ----------
+async function resolveEmailFromIdentifier(identifier) {
+  if (isValidEmail(identifier)) return identifier;
+  const phone = normalizePhone(identifier);
+  const snap = await getDoc(doc(db, 'phoneIndex', phone));
+  return snap.exists() ? snap.data().email : null;
+}
+
+$('#form-login').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  clearErrors(form);
+  const btn = $('#btn-login');
+  const identifier = $('#l-identifier').value.trim();
+  const password = $('#l-password').value;
+  const remember = $('#l-remember').checked;
+
+  if (!identifier) { fieldError(form.querySelector('[data-field=identifier]')); return; }
+  if (!password) { fieldError(form.querySelector('[data-field=password]')); return; }
+
+  setLoading(btn, true);
+  try {
+    const email = await resolveEmailFromIdentifier(identifier);
+    if (!email) {
+      toast('We couldn\u2019t find an account with those details.', 'error');
+      setLoading(btn, false);
+      return;
+    }
+    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+    await signInWithEmailAndPassword(auth, email, password);
+    toast('Welcome back!', 'success');
+    // routing happens in onAuthStateChanged
+  } catch (err) {
+    console.error(err);
+    toast(friendlyAuthError(err), 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+// ---------- Forgot password ----------
+$('#form-forgot').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  clearErrors(form);
+  const btn = $('#btn-forgot');
+  const email = $('#f-email').value.trim();
+  if (!isValidEmail(email)) { fieldError(form.querySelector('[data-field=email]')); return; }
+
+  setLoading(btn, true);
+  try {
+    await sendPasswordResetEmail(auth, email);
+    toast('Reset link sent. Check your inbox.', 'success', 4500);
+    window.location.hash = '#/login';
+  } catch (err) {
+    console.error(err);
+    toast(friendlyAuthError(err), 'error');
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+// ---------- Sign out ----------
+async function doSignOut() {
+  stopPresenceHeartbeat();
+  await signOut(auth);
+  window.location.hash = '#/welcome';
+}
+$('#btn-pending-signout').addEventListener('click', doSignOut);
+$('#btn-profile-signout').addEventListener('click', doSignOut);
+
+// ---------- Edit Profile ----------
+let pendingPhotoFile = null;
+let pendingCoverFile = null;
+
+$('#ep-photo-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 15 * 1024 * 1024) { toast('That photo is too large. Please choose a smaller one.', 'error'); e.target.value = ''; return; }
+  pendingPhotoFile = file;
+  $('#ep-photo-preview').innerHTML = `<img src="${URL.createObjectURL(file)}" alt="">`;
+});
+
+$('#ep-cover-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 15 * 1024 * 1024) { toast('That photo is too large. Please choose a smaller one.', 'error'); e.target.value = ''; return; }
+  pendingCoverFile = file;
+  $('#ep-cover-preview').innerHTML = `<img src="${URL.createObjectURL(file)}" alt="">`;
+});
+
+$('#form-edit-profile').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = $('#btn-save-profile');
+  setLoading(btn, true);
+  try {
+    const updates = {};
+    if (pendingPhotoFile) {
+      const { url } = await uploadCompressedImage(pendingPhotoFile, `profiles/${currentUid}/photo.jpg`, 600, 0.85);
+      updates.profileImageUrl = url;
+    }
+    if (pendingCoverFile && currentUserDoc.role === 'builder') {
+      const { url } = await uploadCompressedImage(pendingCoverFile, `covers/${currentUid}/cover.jpg`, 1200, 0.82);
+      updates.coverImageUrl = url;
+    }
+    if (currentUserDoc.role === 'builder') {
+      updates.bio = $('#ep-bio').value.trim();
+    }
+    if (Object.keys(updates).length) {
+      await updateDoc(doc(db, 'users', currentUid), updates);
+      currentUserDoc = { ...currentUserDoc, ...updates };
+    }
+    pendingPhotoFile = null;
+    pendingCoverFile = null;
+    toast('Profile updated.', 'success');
+    window.location.hash = '#/profile';
+  } catch (err) {
+    console.error('Failed to save profile', err);
+    toast(uploadErrorMessage(err, 'Couldn\u2019t save your profile. Please try again.'), 'error', 6000);
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+// ---------- Add Product ----------
+let pendingProductCover = null;
+let pendingProductFile = null;
+
+$('#ap-cover-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 15 * 1024 * 1024) { toast('That image is too large. Please choose a smaller one.', 'error'); e.target.value = ''; return; }
+  pendingProductCover = file;
+  $('#ap-cover-preview').innerHTML = `<img src="${URL.createObjectURL(file)}" alt="">`;
+});
+
+$('#ap-isdigital').addEventListener('change', (e) => {
+  $('#ap-file-field').style.display = e.target.checked ? '' : 'none';
+});
+
+$('#ap-file-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const sizeError = checkFileSize(file);
+  if (sizeError) { toast(sizeError, 'error'); e.target.value = ''; return; }
+  pendingProductFile = file;
+  $('#ap-file-name').textContent = file.name;
+});
+
+function resetAddProductForm() {
+  $('#form-add-product').reset();
+  $('#ap-cover-preview').innerHTML = 'No cover image yet';
+  $('#ap-file-field').style.display = 'none';
+  $('#ap-file-name').textContent = 'No file chosen';
+  $('#ap-progress').style.display = 'none';
+  $('#ap-progress-bar').style.width = '0%';
+  pendingProductCover = null;
+  pendingProductFile = null;
+}
+
+let addProductUploadGen = 0;
+
+$('#form-add-product').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  clearErrors(form);
+  const btn = $('#btn-add-product');
+
+  const title = $('#ap-title').value.trim();
+  const description = $('#ap-description').value.trim();
+  const category = $('#ap-category').value;
+  const price = parseFloat($('#ap-price').value);
+  const isDigital = $('#ap-isdigital').checked;
+
+  let ok = true;
+  if (!title) { fieldError(form.querySelector('[data-field=title]')); ok = false; }
+  if (!category) { fieldError(form.querySelector('[data-field=category]')); ok = false; }
+  if (isNaN(price) || price < 0) { fieldError(form.querySelector('[data-field=price]')); ok = false; }
+  if (!ok) { toast('Please fix the highlighted fields.', 'error'); return; }
+
+  const myUploadGen = ++addProductUploadGen;
+  setLoading(btn, true);
+  const btnLabel = btn.querySelector('.btn-label');
+  const originalLabel = btnLabel ? btnLabel.textContent : null;
+  if (btnLabel) btnLabel.textContent = 'Uploading…';
+  try {
+    const productId = doc(collection(db, 'products')).id;
+    let coverPath = '', coverUrl = '';
+    if (pendingProductCover) {
+      const res = await uploadCompressedImage(pendingProductCover, `product-covers/${currentUid}/${productId}/cover.jpg`, 900, 0.82);
+      if (myUploadGen !== addProductUploadGen) return; // superseded — abandon this attempt quietly
+      coverPath = res.path; coverUrl = res.url;
+    }
+
+    if (isDigital && pendingProductFile) {
+      $('#ap-progress').style.display = '';
+      const ext = (pendingProductFile.name.split('.').pop() || 'bin');
+      const filePath = `product-files/${currentUid}/${productId}/file.${ext}`;
+      const { path } = await uploadRawFileWithProgress(pendingProductFile, filePath, (pct) => {
+        if (myUploadGen !== addProductUploadGen) return; // ignore stale progress from a superseded attempt
+        $('#ap-progress-bar').style.width = pct + '%';
+      });
+      if (myUploadGen !== addProductUploadGen) return;
+      await setDoc(doc(db, 'products', productId, 'assets', 'main'), {
+        builderId: currentUid, filePath: path, fileName: pendingProductFile.name,
+        fileType: pendingProductFile.type, fileSizeBytes: pendingProductFile.size,
+        createdAt: serverTimestamp()
+      });
+    }
+
+    if (myUploadGen !== addProductUploadGen) return;
+
+    await setDoc(doc(db, 'products', productId), {
+      builderId: currentUid, brandName: currentUserDoc.brandName || currentUserDoc.displayName,
+      title, description, category, price, currency: 'ZMW',
+      isDigital, coverPath, coverUrl, createdAt: serverTimestamp(), isActive: true
+    });
+
+    // The product is genuinely saved at this point — anything from here
+    // down is just UI cleanup/navigation, so it gets its own try/catch.
+    // A cosmetic glitch here should never look like "publishing failed"
+    // when the data actually made it to Firestore fine.
+    toast('Product published!', 'success');
+    try {
+      resetAddProductForm();
+      window.location.hash = '#/builder-market';
+    } catch (cleanupErr) {
+      console.error('Post-publish UI cleanup failed (product was still saved):', cleanupErr);
+    }
+  } catch (err) {
+    if (myUploadGen !== addProductUploadGen) {
+      console.warn('A superseded Add Product upload failed in the background (ignored):', err);
+      return;
+    }
+    console.error('Failed to publish product', err);
+    toast(uploadErrorMessage(err, 'Couldn\u2019t publish that product. Please try again.'), 'error', 6000);
+  } finally {
+    if (myUploadGen === addProductUploadGen) {
+      setLoading(btn, false);
+      if (btnLabel && originalLabel !== null) btnLabel.textContent = originalLabel;
+    }
+  }
+});
+
+// ---------- Router ----------
+const PUBLIC_ROUTES = ['#/welcome', '#/register-builder', '#/register-community', '#/login', '#/forgot'];
+const AUTHED_ROUTES = ['#/pending', '#/builder-dashboard', '#/community-dashboard', '#/discover', '#/joined-communities', '#/profile', '#/edit-profile', '#/wallet', '#/builder-market', '#/add-product', '#/archive', '#/archive-upload', '#/soon'];
+let currentUserDoc = null;
+let currentUid = null;
+let authReady = false;
+let minSplashElapsed = false;
+
+function routeIdFromPath(path) {
+  const map = {
+    '#/welcome': 'screen-welcome',
+    '#/register-builder': 'screen-register-builder',
+    '#/register-community': 'screen-register-community',
+    '#/login': 'screen-login',
+    '#/forgot': 'screen-forgot',
+    '#/pending': 'screen-pending',
+    '#/builder-dashboard': 'screen-builder-dashboard',
+    '#/community-dashboard': 'screen-community-dashboard',
+    '#/discover': 'screen-discover',
+    '#/joined-communities': 'screen-joined-communities',
+    '#/profile': 'screen-profile',
+    '#/edit-profile': 'screen-edit-profile',
+    '#/wallet': 'screen-wallet',
+    '#/builder-market': 'screen-builder-market',
+    '#/add-product': 'screen-add-product',
+    '#/archive': 'screen-archive',
+    '#/archive-upload': 'screen-archive-upload',
+    '#/soon': 'screen-soon'
+  };
+  return map[path] || null;
+}
+
+function parseHash() {
+  const raw = window.location.hash || '#/welcome';
+  const [path, qs] = raw.split('?');
+  return { path, params: new URLSearchParams(qs || '') };
+}
+
+function homeRouteForRole(userDoc) {
+  if (userDoc.role === 'builder') {
+    return userDoc.isActive ? '#/builder-dashboard' : '#/pending';
+  }
+  return '#/community-dashboard';
+}
+
+function updateBottomNav(path, fullHash) {
+  const nav = $('#bottom-nav');
+  if (!currentUserDoc || !AUTHED_ROUTES.includes(path) || path === '#/pending') {
+    nav.classList.remove('visible');
+    return;
+  }
+  nav.classList.add('visible');
+
+  const isBuilder = currentUserDoc.role === 'builder';
+  const homeHash = isBuilder ? '#/builder-dashboard' : '#/community-dashboard';
+  const secondaryHash = isBuilder
+    ? '#/soon?title=Builder+Community&body=See+your+followers%2C+growth%2C+and+top+supporters+here+once+the+Builder+Community+module+is+built.'
+    : '#/discover';
+  $('#nav-secondary-label').textContent = isBuilder ? 'Community' : 'Discover';
+
+  const targets = { home: homeHash, secondary: secondaryHash, wallet: '#/wallet', profile: '#/profile' };
+  $$('.nav-item').forEach(btn => {
+    const slot = btn.dataset.navSlot;
+    btn.onclick = () => { window.location.hash = targets[slot]; };
+    const isActive =
+      (slot === 'home' && path === homeHash) ||
+      (slot === 'secondary' && fullHash === secondaryHash) ||
+      (slot === 'wallet' && path === '#/wallet') ||
+      (slot === 'profile' && path === '#/profile');
+    btn.classList.toggle('active', !!isActive);
+  });
+}
+
+function populatePending() {
+  $('#pending-brand').textContent = currentUserDoc.brandName || '—';
+  $('#pending-method').textContent = ({
+    mobile_money: 'Mobile Money', bank_card: 'Bank Card', bank_account: 'Bank Account'
+  })[currentUserDoc.paymentMethod] || '—';
+}
+
+function populateBuilderDashboard() {
+  $('#bd-brand').textContent = currentUserDoc.brandName || currentUserDoc.displayName || 'Builder';
+  $('#bd-sub-chip').textContent = 'Trial access — payments coming soon';
+}
+
+function populateCommunityDashboard() {
+  $('#cd-name').textContent = currentUserDoc.displayName || 'Builder';
+}
+
+function populateProfile() {
+  const u = currentUserDoc;
+  const avatarEl = $('#profile-avatar');
+  const initial = (u.brandName || u.displayName || '?').trim().charAt(0).toUpperCase();
+  avatarEl.innerHTML = u.profileImageUrl
+    ? `<img src="${u.profileImageUrl}" alt="Profile photo">`
+    : initial;
+
+  const rows = [
+    ['Name', u.displayName],
+    ['Role', u.role === 'builder' ? 'Builder' : 'Community'],
+  ];
+  if (u.role === 'builder') {
+    rows.push(['Brand name', u.brandName]);
+    rows.push(['Category', (u.categories || []).join(', ')]);
+    rows.push(['Bio', u.bio]);
+  }
+  rows.push(['Email', u.email]);
+  rows.push(['Phone', u.phone]);
+  rows.push(['Country', u.country]);
+  rows.push(['Province', u.province]);
+  rows.push(['District', u.district]);
+  rows.push(['Address', u.physicalAddress]);
+  $('#profile-kv').innerHTML = rows
+    .map(([k, v]) => `<div class="kv-row"><span>${k}</span><span>${v && String(v).trim() ? v : '—'}</span></div>`)
+    .join('');
+}
+
+function populateEditProfile() {
+  const u = currentUserDoc;
+  const isBuilder = u.role === 'builder';
+  $('#ep-cover-field').style.display = isBuilder ? '' : 'none';
+  $('#ep-bio-field').style.display = isBuilder ? '' : 'none';
+
+  const photoPreview = $('#ep-photo-preview');
+  const initial = (u.brandName || u.displayName || '?').trim().charAt(0).toUpperCase();
+  photoPreview.innerHTML = u.profileImageUrl ? `<img src="${u.profileImageUrl}" alt="">` : initial;
+
+  const coverPreview = $('#ep-cover-preview');
+  coverPreview.innerHTML = u.coverImageUrl ? `<img src="${u.coverImageUrl}" alt="">` : 'No cover photo yet';
+
+  $('#ep-bio').value = u.bio || '';
+
+  // Reset any pending file selections from a previous visit
+  $('#ep-photo-input').value = '';
+  $('#ep-cover-input').value = '';
+}
+
+async function populateWallet() {
+  $('#wallet-title').textContent = currentUserDoc.role === 'builder' ? 'Builder Wallet' : 'Community Wallet';
+  $('#wallet-balance').textContent = 'K0.00';
+  try {
+    const snap = await getDoc(doc(db, 'wallets', currentUid));
+    if (snap.exists()) {
+      const bal = Number(snap.data().balance || 0);
+      $('#wallet-balance').textContent = `K${bal.toFixed(2)}`;
+    }
+  } catch (err) {
+    console.error('Failed to load wallet', err);
+  }
+}
+
+async function populateDiscover() {
+  const listEl = $('#discover-list');
+  listEl.innerHTML = '<div class="empty-state">Loading Builders…</div>';
+  try {
+    const [q, blockedUids] = await Promise.all([
+      getDocs(query(collection(db, 'users'), where('role', '==', 'builder'), where('isActive', '==', true), limit(50))),
+      loadBlockedUids()
+    ]);
+    const builders = q.docs.map(d => d.data()).filter(b => !blockedUids.includes(b.uid));
+    renderDiscoverList(builders);
+    $('#discover-search').oninput = (e) => {
+      const term = e.target.value.trim().toLowerCase();
+      const filtered = !term ? builders : builders.filter(b =>
+        (b.brandName || '').toLowerCase().includes(term) ||
+        (b.categories || []).join(' ').toLowerCase().includes(term) ||
+        (b.district || '').toLowerCase().includes(term)
+      );
+      renderDiscoverList(filtered);
+    };
+  } catch (err) {
+    console.error('Failed to load builders', err);
+    listEl.innerHTML = '<div class="empty-state">Couldn\u2019t load Builders right now. Pull to refresh and try again.</div>';
+  }
+}
+
+function renderDiscoverList(builders, targetEl) {
+  const listEl = targetEl || $('#discover-list');
+  if (!builders.length) {
+    listEl.innerHTML = '<div class="empty-state">No active Builders yet — check back soon as more join and activate their subscription.</div>';
+    return;
+  }
+  listEl.innerHTML = builders.map(b => {
+    const initial = (b.brandName || b.displayName || '?').trim().charAt(0).toUpperCase();
+    const category = (b.categories || []).join(', ') || 'Builder';
+    const loc = [b.district, b.province].filter(Boolean).join(', ');
+    const avatarInner = b.profileImageUrl ? `<img src="${b.profileImageUrl}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : initial;
+    const online = isRecentlyActive(b.lastActiveAt);
+    return `<button class="builder-card" style="width:100%; border:1.5px solid var(--border); background:var(--white);" data-nav="#/builder-market?uid=${b.uid}">
+      <div class="avatar-wrap">
+        <div class="builder-avatar">${avatarInner}</div>
+        ${online ? '<span class="online-dot" title="Online now"></span>' : ''}
+      </div>
+      <div>
+        <div class="bname">${b.brandName || b.displayName || 'Builder'}</div>
+        <div class="bmeta">${category}${loc ? ' • ' + loc : ''}</div>
+      </div>
+    </button>`;
+  }).join('');
+}
+
+// ---------- Discover / Explore tabs ----------
+let discoverBuildersLoaded = false;
+
+function switchDiscoverTab(tab) {
+  $$('.tab-btn[data-discover-tab]').forEach(b => b.classList.toggle('active', b.dataset.discoverTab === tab));
+  $('#discover-panel-foryou').style.display = tab === 'foryou' ? '' : 'none';
+  $('#discover-panel-builders').style.display = tab === 'builders' ? '' : 'none';
+  // Builder directory is lazy-loaded on first visit to this tab — most
+  // sessions will just scroll the feed, no reason to pay for that query
+  // every time Explore opens.
+  if (tab === 'builders' && !discoverBuildersLoaded) {
+    discoverBuildersLoaded = true;
+    populateDiscover();
+  }
+}
+
+$$('.tab-btn[data-discover-tab]').forEach(btn => {
+  btn.addEventListener('click', () => switchDiscoverTab(btn.dataset.discoverTab));
+});
+
+function populateDiscoverScreen() {
+  discoverBuildersLoaded = false;
+  switchDiscoverTab('foryou');
+  populateForYouFeed(true);
+}
+
+// ---------- "For You" feed: real content across every Builder ----------
+// Chronological + a lightweight "you follow them" boost within each fetched
+// page — not a machine-learning recommender, but genuinely surfaces more
+// of what a user has already shown interest in (by following), same as
+// asked for. Paginated with an explicit "Load more" tap rather than an
+// infinite-scroll observer or a live onSnapshot listener — at thousands of
+// concurrent users, a user-initiated fetch keeps read costs predictable;
+// a live listener per open feed would not.
+let feedCursor = null;
+let feedFollowedIds = [];
+let feedBuilderMetaCache = {};
+let feedItemsIndex = {};
+const FEED_PAGE_SIZE = 15;
+
+async function fetchBuilderMeta(builderIds) {
+  const uncached = builderIds.filter(id => !feedBuilderMetaCache[id]);
+  if (uncached.length) {
+    const docs = await Promise.all(uncached.map(id => getDoc(doc(db, 'users', id)).catch(() => null)));
+    docs.forEach((snap, i) => {
+      feedBuilderMetaCache[uncached[i]] = (snap && snap.exists()) ? snap.data() : { brandName: 'Builder' };
+    });
+  }
+  const map = {};
+  builderIds.forEach(id => { map[id] = feedBuilderMetaCache[id]; });
+  return map;
+}
+
+async function populateForYouFeed(reset) {
+  const listEl = $('#foryou-feed-list');
+  const loadMoreBtn = $('#btn-load-more-feed');
+
+  if (reset) {
+    feedCursor = null;
+    listEl.innerHTML = '<div class="empty-state">Loading your feed…</div>';
+    loadMoreBtn.style.display = 'none';
+    feedFollowedIds = [];
+    if (currentUserDoc.role === 'community') {
+      try {
+        const mSnap = await getDocs(query(collection(db, 'memberships'), where('memberId', '==', currentUid), limit(50)));
+        feedFollowedIds = mSnap.docs.map(d => d.data().builderId);
+      } catch (err) { console.warn('Could not load follows for feed ranking', err); }
+    }
+  } else {
+    setLoading(loadMoreBtn, true);
+  }
+
+  try {
+    let qRef = query(collection(db, 'communityValue'), orderBy('createdAt', 'desc'), limit(FEED_PAGE_SIZE));
+    if (!reset && feedCursor) {
+      qRef = query(collection(db, 'communityValue'), orderBy('createdAt', 'desc'), startAfter(feedCursor), limit(FEED_PAGE_SIZE));
+    }
+    const snap = await getDocs(qRef);
+
+    if (snap.empty) {
+      if (reset) listEl.innerHTML = '<div class="empty-state">No updates yet — check back soon as Builders start posting.</div>';
+      loadMoreBtn.style.display = 'none';
+      return;
+    }
+
+    feedCursor = snap.docs[snap.docs.length - 1];
+    const blockedUids = await loadBlockedUids();
+    const newItems = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(i => !blockedUids.includes(i.builderId));
+    newItems.forEach(i => { feedItemsIndex[i.id] = i; });
+
+    // Bubble up posts from Builders this user already follows, within
+    // this fetched page (does not change WHICH posts are fetched, only
+    // the order they're shown in).
+    newItems.sort((a, b) => {
+      const af = feedFollowedIds.includes(a.builderId) ? 1 : 0;
+      const bf = feedFollowedIds.includes(b.builderId) ? 1 : 0;
+      if (af !== bf) return bf - af;
+      return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+    });
+
+    const builderIds = [...new Set(newItems.map(i => i.builderId))];
+    const metaMap = await fetchBuilderMeta(builderIds);
+
+    if (reset) listEl.innerHTML = '';
+    listEl.insertAdjacentHTML('beforeend', newItems.map(item => renderFeedCard(item, metaMap[item.builderId] || {})).join(''));
+    wireFeedCardActions(listEl);
+
+    loadMoreBtn.style.display = snap.docs.length < FEED_PAGE_SIZE ? 'none' : '';
+  } catch (err) {
+    console.error('Failed to load feed', err);
+    if (reset) listEl.innerHTML = '<div class="empty-state">Couldn\u2019t load your feed right now. Pull to refresh and try again.</div>';
+    else toast('Couldn\u2019t load more updates. Please try again.', 'error');
+  } finally {
+    setLoading(loadMoreBtn, false);
+  }
+}
+
+$('#btn-load-more-feed').addEventListener('click', () => populateForYouFeed(false));
+
+function renderFeedCard(item, meta) {
+  const brandName = meta.brandName || meta.displayName || 'Builder';
+  const initial = brandName.trim().charAt(0).toUpperCase();
+  const avatarInner = meta.profileImageUrl
+    ? `<img src="${meta.profileImageUrl}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
+    : initial;
+  const online = isRecentlyActive(meta.lastActiveAt);
+  const isFollowing = feedFollowedIds.includes(item.builderId);
+  const isSelf = item.builderId === currentUid;
+  const counts = item.reactionCounts || {};
+  const totalReactions = Object.values(counts).reduce((a, b) => a + (Number(b) || 0), 0);
+
+  // Video posts get a real inline <video> (muted, no native controls) that
+  // autoplays as it scrolls into view — see wireFeedVideoAutoplay(). Every
+  // other type keeps using the existing static cvThumb(), tap-to-open.
+  const mediaBlock = item.type === 'video'
+    ? `<div class="feed-media-wrap">
+         <video class="feed-inline-video" data-feed-video="${item.id}" src="${item.mediaUrl}"
+           muted loop playsinline preload="metadata"></video>
+         <button class="feed-mute-btn" type="button" data-mute-toggle aria-label="Toggle sound">🔇</button>
+         <button class="feed-expand-btn" type="button" data-open-cv="${item.id}" aria-label="Open post">⤢</button>
+       </div>`
+    : `<button class="feed-media" data-open-cv="${item.id}" aria-label="Open post">${item.type !== 'text' ? cvThumb(item) : ''}</button>`;
+
+  return `
+    <div class="feed-card" data-feed-card="${item.id}">
+      <div class="feed-card-header">
+        <button class="avatar-wrap" data-open-market="${item.builderId}" style="border:none;background:none;padding:0;" aria-label="View ${brandName}'s Market">
+          <div class="builder-avatar">${avatarInner}</div>
+          ${online ? '<span class="online-dot" title="Online now"></span>' : ''}
+        </button>
+        <div class="feed-card-identity">
+          <div class="fname">${brandName}</div>
+          <div class="presence-text ${online ? 'online' : ''}">${online ? 'Online now' : 'Offline'}</div>
+        </div>
+        ${(!isSelf && currentUserDoc.role === 'community') ? `<button class="btn ${isFollowing ? 'btn-outline' : 'btn-primary'} feed-follow-btn" data-feed-follow="${item.builderId}">${isFollowing ? 'Following' : 'Follow'}</button>` : ''}
+        ${!isSelf ? `<div class="more-wrap" data-feed-more="${item.builderId}" data-feed-more-name="${brandName.replace(/"/g, '&quot;')}" data-feed-more-post="${item.id}">
+          <button class="more-btn" type="button" aria-label="More options">⋯</button>
+          <div class="more-menu"></div>
+        </div>` : ''}
+      </div>
+      ${mediaBlock}
+      <div class="feed-card-body">
+        <div class="cv-caption">${item.caption || ''}</div>
+        <div class="feed-actions">
+          <span>${totalReactions} reactions</span>
+          <span>${item.commentCount || 0} comments</span>
+          <button data-feed-share="${item.id}">🔗 Share</button>
+          ${item.type !== 'text' ? `<button data-feed-download="${item.id}">⬇️ Download</button>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ---------- Scroll-triggered video autoplay (feed) ----------
+// Reels/TikTok-style: a video plays automatically once it's actually
+// visible on screen, and pauses the moment it scrolls away — never more
+// than what's genuinely in view. This matters a lot at scale: with
+// thousands of people scrolling a feed full of videos, playing everything
+// at once (or leaving abandoned videos running in the background) would
+// waste bandwidth and battery for no one's benefit. One shared observer
+// handles every video card; CSS display:none (switching tabs/screens)
+// naturally counts as "not intersecting," so navigating away pauses
+// everything for free with no extra cleanup code needed.
+let feedVideoObserver = null;
+function ensureFeedVideoObserver() {
+  if (feedVideoObserver) return feedVideoObserver;
+  feedVideoObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const video = entry.target;
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+        // Only one (or a couple, mid-transition) video plays at a time —
+        // pause every other feed video before starting this one.
+        document.querySelectorAll('.feed-inline-video').forEach((v) => {
+          if (v !== video && !v.paused) v.pause();
+        });
+        video.play().catch(() => { /* autoplay can still be blocked occasionally — fail silently, the mute button still works */ });
+      } else {
+        video.pause();
+      }
+    });
+  }, { threshold: [0, 0.6, 1] });
+  return feedVideoObserver;
+}
+
+function wireFeedVideoAutoplay(container) {
+  const observer = ensureFeedVideoObserver();
+  $$('.feed-inline-video', container).forEach((video) => {
+    if (video.dataset.wired) return;
+    video.dataset.wired = '1';
+    observer.observe(video);
+    // Tap the video itself to unmute/mute — muted-by-default is required
+    // for autoplay to work at all in most browsers, and is the courteous
+    // default in a scrolling feed anyway.
+    video.addEventListener('click', () => {
+      video.muted = !video.muted;
+      const wrap = video.closest('.feed-media-wrap');
+      const muteBtn = wrap && wrap.querySelector('[data-mute-toggle]');
+      if (muteBtn) muteBtn.textContent = video.muted ? '🔇' : '🔊';
+    });
+  });
+  $$('[data-mute-toggle]', container).forEach((btn) => {
+    if (btn.dataset.wired) return;
+    btn.dataset.wired = '1';
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const video = btn.closest('.feed-media-wrap')?.querySelector('.feed-inline-video');
+      if (!video) return;
+      video.muted = !video.muted;
+      btn.textContent = video.muted ? '🔇' : '🔊';
+    });
+  });
+}
+
+function wireFeedCardActions(container) {
+  wireFeedVideoAutoplay(container);
+  $$('[data-feed-more]', container).forEach(el => {
+    if (el.dataset.wired) return;
+    el.dataset.wired = '1';
+    const builderId = el.dataset.feedMore;
+    const brandName = el.dataset.feedMoreName;
+    const postId = el.dataset.feedMorePost;
+    loadBlockedUids().then((blockedUids) => {
+      const blocked = blockedUids.includes(builderId);
+      wireMoreMenu(el, [
+        { label: 'Report this post', onClick: () => openReportModal('post', postId, builderId) },
+        blocked
+          ? { label: 'Unblock', danger: true, onClick: () => unblockUserAccount(builderId).then(() => populateForYouFeed(true)) }
+          : { label: `Block ${brandName}`, danger: true, onClick: () => blockUserAccount(builderId, brandName).then(() => populateForYouFeed(true)) }
+      ]);
+    });
+  });
+  $$('[data-open-cv]', container).forEach(el => {
+    if (el.dataset.wired) return;
+    el.dataset.wired = '1';
+    el.addEventListener('click', () => {
+      const card = el.closest('[data-feed-card]');
+      const item = card && feedItemsIndex[card.dataset.feedCard];
+      if (item) openPostLightbox(item, item.builderId === currentUid);
+    });
+  });
+  $$('[data-open-market]', container).forEach(el => {
+    if (el.dataset.wired) return;
+    el.dataset.wired = '1';
+    el.addEventListener('click', () => { window.location.hash = `#/builder-market?uid=${el.dataset.openMarket}`; });
+  });
+  $$('[data-feed-share]', container).forEach(el => {
+    if (el.dataset.wired) return;
+    el.dataset.wired = '1';
+    el.addEventListener('click', () => { const item = feedItemsIndex[el.dataset.feedShare]; if (item) shareMedia(item, el); });
+  });
+  $$('[data-feed-download]', container).forEach(el => {
+    if (el.dataset.wired) return;
+    el.dataset.wired = '1';
+    el.addEventListener('click', () => { const item = feedItemsIndex[el.dataset.feedDownload]; if (item) downloadMedia(item, el); });
+  });
+  $$('[data-feed-follow]', container).forEach(el => {
+    if (el.dataset.wired) return;
+    el.dataset.wired = '1';
+    el.addEventListener('click', async () => {
+      const builderId = el.dataset.feedFollow;
+      const currentlyFollowing = feedFollowedIds.includes(builderId);
+      setLoading(el, true);
+      try {
+        if (currentlyFollowing) {
+          await leaveBuilderCommunity(builderId);
+          feedFollowedIds = feedFollowedIds.filter(id => id !== builderId);
+        } else {
+          await joinBuilderCommunity(builderId);
+          feedFollowedIds.push(builderId);
+        }
+        $$(`[data-feed-follow="${builderId}"]`).forEach(btn => {
+          const nowFollowing = feedFollowedIds.includes(builderId);
+          btn.textContent = nowFollowing ? 'Following' : 'Follow';
+          btn.className = `btn ${nowFollowing ? 'btn-outline' : 'btn-primary'} feed-follow-btn`;
+        });
+      } catch (err) {
+        console.error('Failed to update follow from feed', err);
+        toast('Couldn\u2019t update that right now. Please try again.', 'error');
+      } finally {
+        setLoading(el, false);
+      }
+    });
+  });
+}
+
+async function populateJoinedCommunities() {
+  const listEl = $('#joined-communities-list');
+  listEl.innerHTML = '<div class="empty-state">Loading your communities…</div>';
+  try {
+    const q = query(collection(db, 'memberships'), where('memberId', '==', currentUid), limit(100));
+    const snap = await getDocs(q);
+    const builderIds = snap.docs.map(d => d.data().builderId);
+    if (!builderIds.length) {
+      listEl.innerHTML = '<div class="empty-state">You haven\u2019t joined any Builder communities yet. Head to Discover to find one.</div>';
+      return;
+    }
+    const builderDocs = await Promise.all(builderIds.map(uid => getDoc(doc(db, 'users', uid))));
+    const builders = builderDocs.filter(s => s.exists()).map(s => s.data());
+    renderDiscoverList(builders, listEl);
+  } catch (err) {
+    console.error('Failed to load joined communities', err);
+    listEl.innerHTML = '<div class="empty-state">Couldn\u2019t load your communities right now. Pull to refresh and try again.</div>';
+  }
+}
+
+// ---------- Builder Market ----------
+let currentMarketTargetUid = null;
+let currentMarketIsOwner = false;
+let currentMarketIsMember = false;
+
+function membershipDocId(builderId, memberId) { return `${builderId}_${memberId}`; }
+
+async function checkMembership(builderId, memberId) {
+  if (!builderId || !memberId) return false;
+  const snap = await getDoc(doc(db, 'memberships', membershipDocId(builderId, memberId)));
+  return snap.exists();
+}
+
+async function joinBuilderCommunity(builderId) {
+  if (!builderId || builderId === currentUid) {
+    throw new Error('There\u2019s no Builder selected to follow.');
+  }
+  await setDoc(doc(db, 'memberships', membershipDocId(builderId, currentUid)), {
+    builderId, memberId: currentUid,
+    memberName: currentUserDoc.displayName || 'Community member',
+    joinedAt: serverTimestamp()
+  });
+}
+
+async function leaveBuilderCommunity(builderId) {
+  await deleteDoc(doc(db, 'memberships', membershipDocId(builderId, currentUid)));
+}
+
+$('#btn-toggle-join').addEventListener('click', async () => {
+  const btn = $('#btn-toggle-join');
+  if (!currentMarketTargetUid) return;
+  setLoading(btn, true);
+  try {
+    if (currentMarketIsMember) {
+      await leaveBuilderCommunity(currentMarketTargetUid);
+      currentMarketIsMember = false;
+      toast('Unfollowed.', 'info');
+    } else {
+      await joinBuilderCommunity(currentMarketTargetUid);
+      currentMarketIsMember = true;
+      toast('You\u2019re now following this Builder!', 'success');
+    }
+    renderJoinBar();
+    // Refresh the Updates tab so the Follow button state there stays in sync.
+    if ($('#bm-panel-updates').style.display !== 'none') {
+      populateCommunityValue(currentMarketTargetUid, currentMarketIsOwner, currentMarketIsMember);
+    }
+  } catch (err) {
+    console.error('Failed to update membership', err);
+    toast(uploadErrorMessage(err, 'Couldn\u2019t update that right now. Please try again.'), 'error', 6000);
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+function renderJoinBar() {
+  const bar = $('#market-join-bar');
+  const btn = $('#btn-toggle-join');
+  const status = $('#market-join-status');
+  const showBar = !currentMarketIsOwner && currentUserDoc.role === 'community' && !!currentMarketTargetUid;
+  bar.style.display = showBar ? '' : 'none';
+  if (!showBar) return;
+  status.textContent = currentMarketIsMember ? '\u2713 You\u2019re following this Builder' : 'Follow to keep up with new posts';
+  btn.querySelector('.btn-label')?.remove();
+  btn.textContent = currentMarketIsMember ? 'Following' : 'Follow';
+  btn.className = currentMarketIsMember ? 'btn btn-outline' : 'btn btn-primary';
+}
+
+async function populateBuilderMarket(params) {
+  const explicitUid = params.get('uid');
+  // Only fall back to "my own Market" when the viewer is actually a
+  // Builder landing here from their own dashboard with no ?uid=. A
+  // Community viewer with no explicit uid has no valid target at all —
+  // targetUid must be null, not silently the viewer's own account, or
+  // every downstream check (isOwner, membership, Follow) ends up
+  // reasoning about the wrong person entirely.
+  const targetUid = explicitUid || (currentUserDoc.role === 'builder' ? currentUid : null);
+  const isOwner = !!targetUid && targetUid === currentUid && currentUserDoc.role === 'builder';
+  currentMarketTargetUid = targetUid;
+  currentMarketIsOwner = isOwner;
+  currentMarketIsMember = isOwner; // owners always have full access to their own content
+  const addBtn = $('#btn-add-product-nav');
+  const listEl = $('#bm-list');
+  addBtn.style.display = isOwner ? '' : 'none';
+  $('#market-join-bar').style.display = 'none';
+
+  if (!targetUid) {
+    $('#bm-title').textContent = 'Builder Market';
+    $('#bm-presence').style.display = 'none';
+    switchMarketTab('updates');
+    listEl.innerHTML = '<div class="empty-state">Pick a Builder from Discover to view their Market.</div>';
+    $('#community-value-list').innerHTML = '<div class="empty-state">Pick a Builder from Discover to see their updates.</div>';
+    return;
+  }
+
+  switchMarketTab('updates');
+
+  if (!isOwner && currentUserDoc.role === 'community') {
+    try {
+      currentMarketIsMember = await checkMembership(targetUid, currentUid);
+    } catch (err) {
+      console.error('Failed to check membership', err);
+    }
+    renderJoinBar();
+    // Membership may have resolved after the Updates tab already tried to
+    // load — refresh it now that we know the real state.
+    if ($('#bm-panel-updates').style.display !== 'none') {
+      populateCommunityValue(currentMarketTargetUid, currentMarketIsOwner, currentMarketIsMember);
+    }
+  }
+
+  listEl.innerHTML = '<div class="empty-state">Loading products…</div>';
+
+  try {
+    let brandName = isOwner ? (currentUserDoc.brandName || currentUserDoc.displayName) : null;
+    let builderMeta = isOwner ? currentUserDoc : null;
+    if (!isOwner) {
+      const uSnap = await getDoc(doc(db, 'users', targetUid));
+      builderMeta = uSnap.exists() ? uSnap.data() : null;
+      brandName = builderMeta ? (builderMeta.brandName || builderMeta.displayName) : 'Builder';
+    }
+    $('#bm-title').textContent = isOwner ? 'My Market' : `${brandName}'s Market`;
+
+    const moreWrap = $('#bm-more-wrap');
+    if (!isOwner) {
+      moreWrap.style.display = '';
+      const blocked = (await loadBlockedUids()).includes(targetUid);
+      wireMoreMenu(moreWrap, [
+        { label: 'Report this Builder', onClick: () => openReportModal('user', targetUid, targetUid) },
+        blocked
+          ? { label: 'Unblock', danger: true, onClick: () => unblockUserAccount(targetUid).then(() => populateBuilderMarket(params)) }
+          : { label: 'Block this Builder', danger: true, onClick: () => blockUserAccount(targetUid, brandName).then(() => { window.location.hash = '#/discover'; }) }
+      ]);
+    } else {
+      moreWrap.style.display = 'none';
+    }
+
+    const presenceEl = $('#bm-presence');
+    if (!isOwner && builderMeta) {
+      const online = isRecentlyActive(builderMeta.lastActiveAt);
+      presenceEl.textContent = online ? 'Online now' : 'Offline';
+      presenceEl.classList.toggle('online', online);
+      presenceEl.style.display = '';
+    } else {
+      presenceEl.style.display = 'none';
+    }
+
+    const q = query(collection(db, 'products'), where('builderId', '==', targetUid), limit(50));
+    const snap = await getDocs(q);
+    const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderProductGrid(products, isOwner);
+  } catch (err) {
+    console.error('Failed to load market', err);
+    listEl.innerHTML = '<div class="empty-state">Couldn\u2019t load this Market right now. Pull to refresh and try again.</div>';
+  }
+}
+
+function switchMarketTab(tab) {
+  $$('.tab-btn[data-market-tab]').forEach(b => b.classList.toggle('active', b.dataset.marketTab === tab));
+  $('#bm-panel-updates').style.display = tab === 'updates' ? '' : 'none';
+  $('#bm-panel-products').style.display = tab === 'products' ? '' : 'none';
+  $('#bm-panel-testimonials').style.display = tab === 'testimonials' ? '' : 'none';
+  $('#bm-panel-live').style.display = tab === 'live' ? '' : 'none';
+  if (tab === 'testimonials') populateTestimonials(currentMarketTargetUid, currentMarketIsOwner);
+  if (tab === 'updates') populateCommunityValue(currentMarketTargetUid, currentMarketIsOwner, currentMarketIsMember);
+}
+
+$$('.tab-btn[data-market-tab]').forEach(btn => {
+  btn.addEventListener('click', () => switchMarketTab(btn.dataset.marketTab));
+});
+
+async function populateTestimonials(targetUid, isOwner) {
+  const formWrap = $('#bm-testimonial-form-wrap');
+  const listEl = $('#testimonial-list');
+  formWrap.style.display = (!isOwner && targetUid) ? '' : 'none';
+  if (!isOwner) {
+    $('#form-testimonial').reset();
+    $('#ts-photo-preview').innerHTML = 'No photo added';
+    pendingTestimonialPhoto = null;
+  }
+  if (!targetUid) { listEl.innerHTML = '<div class="empty-state">Pick a Builder from Discover first.</div>'; return; }
+  listEl.innerHTML = '<div class="empty-state">Loading testimonials…</div>';
+  try {
+    const q = query(collection(db, 'testimonials'), where('builderId', '==', targetUid), limit(50));
+    const snap = await getDocs(q);
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    if (!items.length) {
+      listEl.innerHTML = '<div class="empty-state">No testimonials yet — be the first to share one.</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(t => `
+      <div class="testimonial-card">
+        <div class="thead">
+          <div class="builder-avatar" style="width:34px;height:34px;font-size:14px;">${(t.authorName || '?').charAt(0).toUpperCase()}</div>
+          <div class="tauthor">${t.authorName || 'Community member'}</div>
+        </div>
+        <div class="ttext">${t.text}</div>
+        ${t.photoUrl ? `<img class="tphoto" src="${t.photoUrl}" alt="">` : ''}
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error('Failed to load testimonials', err);
+    listEl.innerHTML = '<div class="empty-state">Couldn\u2019t load testimonials right now.</div>';
+  }
+}
+
+let pendingTestimonialPhoto = null;
+$('#ts-photo-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) { toast('That photo is too large.', 'error'); e.target.value = ''; return; }
+  pendingTestimonialPhoto = file;
+  $('#ts-photo-preview').innerHTML = `<img src="${URL.createObjectURL(file)}" alt="" style="width:100%;height:100%;object-fit:cover;">`;
+});
+
+$('#form-testimonial').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = $('#btn-submit-testimonial');
+  const text = $('#ts-text').value.trim();
+  if (!text) { toast('Write a few words first.', 'error'); return; }
+  if (!currentMarketTargetUid) return;
+  if (throttled('testimonial', 5000)) {
+    toast('Please wait a moment before posting again.', 'info', 2200);
+    return;
+  }
+
+  setLoading(btn, true);
+  try {
+    const testimonialId = doc(collection(db, 'testimonials')).id;
+    let photoUrl = '';
+    if (pendingTestimonialPhoto) {
+      const res = await uploadCompressedImage(pendingTestimonialPhoto, `testimonial-photos/${currentUid}/${testimonialId}/photo.jpg`, 900, 0.82);
+      photoUrl = res.url;
+    }
+    await setDoc(doc(db, 'testimonials', testimonialId), {
+      builderId: currentMarketTargetUid, authorUid: currentUid,
+      authorName: currentUserDoc.displayName || currentUserDoc.brandName || 'Community member',
+      text, photoUrl, createdAt: serverTimestamp()
+    });
+    toast('Testimonial posted!', 'success');
+    populateTestimonials(currentMarketTargetUid, currentMarketIsOwner);
+  } catch (err) {
+    console.error('Failed to post testimonial', err);
+    toast(uploadErrorMessage(err, 'Couldn\u2019t post that testimonial. Please try again.'), 'error', 6000);
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+// ---------- Community Value (public feed — the actual playable media) ----------
+const REACTION_EMOJIS = ['👍', '❤️', '🔥', '👏', '😂'];
+
+async function populateCommunityValue(targetUid, isOwner, isMember) {
+  const postBtn = $('#btn-post-update');
+  const formWrap = $('#cv-form-wrap');
+  postBtn.style.display = isOwner ? '' : 'none';
+  if (!isOwner) formWrap.style.display = 'none';
+
+  const listEl = $('#community-value-list');
+  if (!targetUid) { listEl.innerHTML = ''; return; }
+
+  // Photos/videos/music are public to everyone signed in, same as a
+  // Facebook/Instagram profile — Following a Builder is about staying
+  // updated and showing up in that Builder's "Joined Communities" list,
+  // not a paywall on their content. (Paid, download-gated content is a
+  // separate thing — see product-files / the Payments phase.)
+  listEl.innerHTML = '<div class="empty-state">Loading updates…</div>';
+  try {
+    const q = query(collection(db, 'communityValue'), where('builderId', '==', targetUid), limit(50));
+    const snap = await getDocs(q);
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    renderCommunityValueList(items, isOwner);
+  } catch (err) {
+    console.error('Failed to load updates', err);
+    listEl.innerHTML = '<div class="empty-state">Couldn\u2019t load updates right now. Pull to refresh and try again.</div>';
+  }
+}
+
+function cvThumb(item) {
+  if (item.type === 'image') return `<img src="${item.mediaUrl}" alt="">`;
+  if (item.type === 'video') return `<video src="${item.mediaUrl}" muted preload="metadata"></video><span class="cv-grid-play">▶</span>`;
+  if (item.type === 'audio') return `<div class="cv-grid-audio-tile">🎵<span>${(item.caption || 'Audio').slice(0, 40)}</span></div>`;
+  return '';
+}
+
+function renderCommunityValueList(items, isOwner) {
+  const listEl = $('#community-value-list');
+  if (!items.length) {
+    listEl.innerHTML = `<div class="empty-state">${isOwner ? 'Nothing posted yet — share a photo, video, track, or update.' : 'No updates from this Builder yet.'}</div>`;
+    return;
+  }
+
+  const mediaItems = items.filter(i => i.type !== 'text');
+  const textItems = items.filter(i => i.type === 'text');
+
+  const gridHtml = mediaItems.length ? `
+    <div class="cv-grid">
+      ${mediaItems.map(item => `
+        <button class="cv-grid-item" data-open-cv="${item.id}" aria-label="Open ${item.type}">
+          ${cvThumb(item)}
+        </button>
+      `).join('')}
+    </div>` : '';
+
+  const textHtml = textItems.map(item => `
+    <div class="cv-card">
+      <div class="cv-body">
+        <div class="cv-caption" data-open-cv="${item.id}" style="cursor:pointer;">${item.caption}</div>
+        <div class="cv-meta">
+          <span class="cv-type-tag">update</span>
+          ${isOwner ? `<button class="btn btn-danger-outline" style="padding:6px 10px;font-size:11.5px;" data-delete-cv="${item.id}">Delete</button>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  listEl.innerHTML = gridHtml + textHtml;
+
+  const itemsById = {};
+  items.forEach(i => { itemsById[i.id] = i; });
+
+  $$('[data-open-cv]', listEl).forEach(el => {
+    el.addEventListener('click', () => {
+      const item = itemsById[el.dataset.openCv];
+      if (item) openPostLightbox(item, isOwner);
+    });
+  });
+  if (isOwner) {
+    $$('[data-delete-cv]', listEl).forEach(btn => {
+      btn.addEventListener('click', (e) => { e.stopPropagation(); deleteCommunityValue(btn.dataset.deleteCv); });
+    });
+  }
+}
+
+// ---------- Post lightbox: media + reactions + comments ----------
+// The single detail view for any Community Value post — media playback,
+// Open/Download/Share, emoji reactions, and comments all live here so a
+// tap on a grid tile or a text update opens the same full experience.
+async function openPostLightbox(item, isOwner) {
+  // Avoid two videos/audio playing at once — the lightbox is about to
+  // start its own playback with sound.
+  document.querySelectorAll('.feed-inline-video').forEach((v) => v.pause());
+
+  const overlay = document.createElement('div');
+  overlay.className = 'media-lightbox';
+
+  let mediaHtml = '';
+  if (item.type === 'image') mediaHtml = `<img src="${item.mediaUrl}" alt="">`;
+  else if (item.type === 'video') mediaHtml = `<video src="${item.mediaUrl}" controls autoplay playsinline></video>`;
+  else if (item.type === 'audio') mediaHtml = `<audio src="${item.mediaUrl}" controls autoplay></audio>`;
+
+  const hasMedia = item.type !== 'text' && item.mediaUrl;
+  const counts = item.reactionCounts || {};
+
+  overlay.innerHTML = `
+    <button class="media-lightbox-close" aria-label="Close">✕</button>
+    <div class="lightbox-scroll">
+      ${mediaHtml ? `<div class="media-lightbox-content">${mediaHtml}</div>` : ''}
+      ${item.caption ? `<div class="media-lightbox-caption">${item.caption}</div>` : ''}
+      ${hasMedia ? `
+      <div class="cv-media-actions">
+        <button class="btn btn-outline" data-lb-download>⬇️ Download</button>
+        <button class="btn btn-outline" data-lb-share>🔗 Share</button>
+        ${isOwner ? `<button class="btn btn-danger-outline" data-lb-delete>Delete</button>` : ''}
+      </div>` : (isOwner ? `<div class="cv-media-actions"><button class="btn btn-danger-outline" data-lb-delete>Delete</button></div>` : '')}
+      <div class="lightbox-reactions" id="lb-reactions">
+        ${REACTION_EMOJIS.map(e => `<button class="reaction-btn" data-emoji="${e}">${e} <span>${counts[e] || 0}</span></button>`).join('')}
+      </div>
+      <div class="lightbox-comments">
+        <h4>Comments</h4>
+        <div id="lb-comment-list" class="empty-state">Loading comments…</div>
+        <form id="lb-comment-form" class="comment-input-row">
+          <input type="text" id="lb-comment-input" placeholder="Write a comment…" maxlength="300" required>
+          <button class="btn btn-primary" type="submit">Post</button>
+        </form>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay || e.target.classList.contains('media-lightbox-close')) overlay.remove();
+  });
+  overlay.querySelector('[data-lb-download]')?.addEventListener('click', (e) => downloadMedia(item, e.currentTarget));
+  overlay.querySelector('[data-lb-share]')?.addEventListener('click', (e) => shareMedia(item, e.currentTarget));
+  overlay.querySelector('[data-lb-delete]')?.addEventListener('click', async () => {
+    overlay.remove();
+    await deleteCommunityValue(item.id);
+  });
+
+  wireReactions(overlay, item);
+  wireComments(overlay, item, isOwner);
+}
+
+async function wireReactions(overlay, item) {
+  const bar = overlay.querySelector('#lb-reactions');
+  let myReaction = null;
+  try {
+    const snap = await getDoc(doc(db, 'communityValue', item.id, 'reactions', currentUid));
+    myReaction = snap.exists() ? snap.data().emoji : null;
+  } catch (err) { /* not fatal — reactions just won't be pre-highlighted */ }
+
+  const highlight = () => {
+    $$('.reaction-btn', bar).forEach(btn => btn.classList.toggle('active', btn.dataset.emoji === myReaction));
+  };
+  highlight();
+
+  $$('.reaction-btn', bar).forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const emoji = btn.dataset.emoji;
+      const prev = myReaction;
+      // Optimistic UI update, then reconcile with the server.
+      myReaction = (prev === emoji) ? null : emoji;
+      highlight();
+      const bump = (e, d) => {
+        const span = bar.querySelector(`[data-emoji="${e}"] span`);
+        if (span) span.textContent = Math.max(0, Number(span.textContent) + d);
+      };
+      if (prev && prev !== emoji) bump(prev, -1);
+      if (myReaction === emoji && prev !== emoji) bump(emoji, 1);
+      if (prev === emoji) bump(emoji, -1);
+      try {
+        await toggleReaction(item.id, emoji, prev);
+      } catch (err) {
+        console.error('Failed to save reaction', err);
+        toast('Couldn\u2019t save your reaction. Please try again.', 'error');
+      }
+    });
+  });
+}
+
+async function toggleReaction(postId, emoji, previousEmoji) {
+  const reactionRef = doc(db, 'communityValue', postId, 'reactions', currentUid);
+  const postRef = doc(db, 'communityValue', postId);
+  await runTransaction(db, async (tx) => {
+    if (previousEmoji === emoji) {
+      tx.delete(reactionRef);
+      tx.update(postRef, { [`reactionCounts.${emoji}`]: increment(-1) });
+    } else {
+      tx.set(reactionRef, { emoji, uid: currentUid, createdAt: serverTimestamp() });
+      tx.update(postRef, { [`reactionCounts.${emoji}`]: increment(1) });
+      if (previousEmoji) tx.update(postRef, { [`reactionCounts.${previousEmoji}`]: increment(-1) });
+    }
+  });
+}
+
+async function wireComments(overlay, item, isOwner) {
+  const listEl = overlay.querySelector('#lb-comment-list');
+  const form = overlay.querySelector('#lb-comment-form');
+  const input = overlay.querySelector('#lb-comment-input');
+
+  async function refreshComments() {
+    listEl.innerHTML = '<div class="empty-state">Loading comments…</div>';
+    try {
+      const snap = await getDocs(collection(db, 'communityValue', item.id, 'comments'));
+      const comments = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+      if (!comments.length) {
+        listEl.innerHTML = '<div class="empty-state">No comments yet — be the first to say something.</div>';
+        return;
+      }
+      listEl.innerHTML = comments.map(c => `
+        <div class="comment-item">
+          <div class="comment-author">${c.authorName || 'Member'}</div>
+          <div class="comment-text">${c.text}</div>
+          <div class="comment-actions">
+            ${c.authorUid !== currentUid ? `<button class="comment-report" data-report-comment-id="${c.id}" data-report-comment-author="${c.authorUid}">Report</button>` : ''}
+            ${(c.authorUid === currentUid || isOwner) ? `<button class="comment-delete" data-comment-id="${c.id}" aria-label="Delete comment">✕</button>` : ''}
+          </div>
+        </div>
+      `).join('');
+      $$('[data-report-comment-id]', listEl).forEach(btn => {
+        btn.addEventListener('click', () => {
+          openReportModal('comment', btn.dataset.reportCommentId, btn.dataset.reportCommentAuthor);
+        });
+      });
+      $$('[data-comment-id]', listEl).forEach(btn => {
+        btn.addEventListener('click', async () => {
+          try {
+            await deleteDoc(doc(db, 'communityValue', item.id, 'comments', btn.dataset.commentId));
+            await updateDoc(doc(db, 'communityValue', item.id), { commentCount: increment(-1) });
+            refreshComments();
+          } catch (err) {
+            console.error('Failed to delete comment', err);
+            toast('Couldn\u2019t delete that comment. Please try again.', 'error');
+          }
+        });
+      });
+    } catch (err) {
+      console.error('Failed to load comments', err);
+      listEl.innerHTML = '<div class="empty-state">Couldn\u2019t load comments right now.</div>';
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    if (throttled('comment', 3000)) {
+      toast('Please wait a moment before posting again.', 'info', 2200);
+      return;
+    }
+    const submitBtn = form.querySelector('button[type=submit]');
+    setLoading(submitBtn, true);
+    try {
+      const commentId = doc(collection(db, 'communityValue', item.id, 'comments')).id;
+      await setDoc(doc(db, 'communityValue', item.id, 'comments', commentId), {
+        authorUid: currentUid,
+        authorName: currentUserDoc.displayName || currentUserDoc.brandName || 'Member',
+        text, createdAt: serverTimestamp()
+      });
+      await updateDoc(doc(db, 'communityValue', item.id), { commentCount: increment(1) });
+      input.value = '';
+      refreshComments();
+    } catch (err) {
+      console.error('Failed to post comment', err);
+      toast(uploadErrorMessage(err, 'Couldn\u2019t post that comment. Please try again.'), 'error', 6000);
+    } finally {
+      setLoading(submitBtn, false);
+    }
+  });
+
+  refreshComments();
+}
+
+// ---------- Media consumption: download / share ----------
+// Works for any item with a mediaUrl + type (image/video/audio) — used by
+// Community Value posts (Builder "reels") today, and reusable anywhere else
+// a Builder's uploaded media needs to be saved or shared out.
+// ---------- Reporting & Blocking (primary anti-abuse mechanism) ----------
+// At real scale, automated content moderation is a whole separate project.
+// Reporting + blocking is what every major platform actually leans on day
+// one — it's cheap, it's real, and it gives admins a queue to act on
+// instead of having no signal at all until something goes viral for the
+// wrong reasons.
+const REPORT_REASONS = [
+  ['spam', 'Spam or scam'],
+  ['harassment', 'Harassment or bullying'],
+  ['inappropriate', 'Inappropriate content'],
+  ['fake_account', 'Fake account / impersonation'],
+  ['other', 'Something else']
+];
+
+function openReportModal(targetType, targetId, targetOwnerUid) {
+  const overlay = document.createElement('div');
+  overlay.className = 'report-overlay open';
+  overlay.innerHTML = `
+    <div class="report-sheet">
+      <h3>Report ${targetType === 'user' ? 'this account' : 'this ' + targetType}</h3>
+      <div class="sub">Your report is confidential — the person you're reporting won't be notified.</div>
+      <form id="report-form">
+        ${REPORT_REASONS.map(([val, label], i) => `
+          <label class="report-reason">
+            <input type="radio" name="reason" value="${val}" ${i === 0 ? 'checked' : ''}>
+            ${label}
+          </label>
+        `).join('')}
+        <div class="field">
+          <label for="report-details">Anything else we should know? (optional)</label>
+          <textarea id="report-details" rows="3" maxlength="400"></textarea>
+        </div>
+        <button class="btn btn-maroon" type="submit" id="btn-submit-report">
+          <span class="btn-spinner"></span><span class="btn-label">Submit report</span>
+        </button>
+        <button class="btn btn-outline" type="button" id="btn-cancel-report" style="margin-top:10px;">Cancel</button>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  overlay.querySelector('#btn-cancel-report').addEventListener('click', close);
+
+  overlay.querySelector('#report-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = overlay.querySelector('#btn-submit-report');
+    const reason = overlay.querySelector('input[name=reason]:checked').value;
+    const details = overlay.querySelector('#report-details').value.trim();
+    setLoading(btn, true);
+    try {
+      await setDoc(doc(collection(db, 'reports')), {
+        targetType, targetId, targetOwnerUid: targetOwnerUid || null,
+        reporterUid: currentUid, reason, details, status: 'open', createdAt: serverTimestamp()
+      });
+      toast('Report submitted. Thank you for helping keep the community safe.', 'success');
+      close();
+    } catch (err) {
+      console.error('Failed to submit report', err);
+      toast('Couldn\u2019t submit that report. Please try again.', 'error');
+      setLoading(btn, false);
+    }
+  });
+}
+
+function blockDocId(blockerUid, blockedUid) { return `${blockerUid}_${blockedUid}`; }
+
+let blockedUidsCache = null; // null = not loaded yet this session
+
+async function loadBlockedUids(forceRefresh) {
+  if (blockedUidsCache && !forceRefresh) return blockedUidsCache;
+  try {
+    const snap = await getDocs(query(collection(db, 'blocks'), where('blockerUid', '==', currentUid), limit(500)));
+    blockedUidsCache = snap.docs.map((d) => d.data().blockedUid);
+  } catch (err) {
+    console.warn('Could not load blocked users list', err);
+    blockedUidsCache = blockedUidsCache || [];
+  }
+  return blockedUidsCache;
+}
+
+async function blockUserAccount(blockedUid, blockedName) {
+  if (!blockedUid || blockedUid === currentUid) return;
+  if (!confirm(`Block ${blockedName || 'this user'}? You won\u2019t see their posts or products anymore.`)) return;
+  try {
+    await setDoc(doc(db, 'blocks', blockDocId(currentUid, blockedUid)), {
+      blockerUid: currentUid, blockedUid, createdAt: serverTimestamp()
+    });
+    if (blockedUidsCache) blockedUidsCache.push(blockedUid);
+    toast(`${blockedName || 'User'} blocked.`, 'success');
+  } catch (err) {
+    console.error('Failed to block user', err);
+    toast('Couldn\u2019t block that user right now. Please try again.', 'error');
+  }
+}
+
+async function unblockUserAccount(blockedUid) {
+  try {
+    await deleteDoc(doc(db, 'blocks', blockDocId(currentUid, blockedUid)));
+    if (blockedUidsCache) blockedUidsCache = blockedUidsCache.filter((id) => id !== blockedUid);
+    toast('Unblocked.', 'success');
+  } catch (err) {
+    console.error('Failed to unblock user', err);
+    toast('Couldn\u2019t unblock that user right now. Please try again.', 'error');
+  }
+}
+
+// Small "more options" menu (⋯) used wherever Report/Block need to live —
+// Builder Market header, feed card headers, etc. Renders into whatever
+// element you pass it and wires its own open/close + outside-click.
+function wireMoreMenu(wrapEl, items) {
+  const btn = wrapEl.querySelector('.more-btn');
+  const menu = wrapEl.querySelector('.more-menu');
+  if (!btn || !menu) return;
+  menu.innerHTML = items.map((it, i) => `<button type="button" data-idx="${i}" class="${it.danger ? 'danger' : ''}">${it.label}</button>`).join('');
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.more-menu.open').forEach((m) => { if (m !== menu) m.classList.remove('open'); });
+    menu.classList.toggle('open');
+  });
+  menu.querySelectorAll('button').forEach((mb) => {
+    mb.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.remove('open');
+      items[Number(mb.dataset.idx)].onClick();
+    });
+  });
+  document.addEventListener('click', () => menu.classList.remove('open'));
+}
+
+// ---------- Lightweight spam deterrent ----------
+// True rate-limiting needs server-side enforcement (Cloud Functions or
+// routing writes through a backend) — neither is in place yet. This is a
+// client-side cooldown, which won't stop a determined bad actor calling
+// Firestore directly, but it does stop the single most common form of
+// "misuse" on any social app: accidental rapid double-posting from
+// over-tapping a button on a slow connection.
+const lastActionAt = {};
+function throttled(key, minGapMs = 3000) {
+  const now = Date.now();
+  if (lastActionAt[key] && now - lastActionAt[key] < minGapMs) return true;
+  lastActionAt[key] = now;
+  return false;
+}
+
+async function downloadMedia(item, btnEl) {
+  if (!item || !item.mediaUrl) return;
+  const originalHTML = btnEl ? btnEl.innerHTML : null;
+  if (btnEl) { btnEl.disabled = true; btnEl.innerHTML = '⏳ Preparing…'; }
+  const ext = (item.mediaUrl.split('?')[0].split('.').pop() || 'file').slice(0, 5);
+  const filename = `${(item.caption || 'talent-media').slice(0, 40).replace(/[^\w\- ]/g, '').trim() || 'talent-media'}.${ext}`;
+  try {
+    const res = await fetch(item.mediaUrl);
+    if (!res.ok) throw new Error('fetch failed');
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
+    toast('Download started.', 'success');
+  } catch (err) {
+    // Cross-origin fetch can be blocked depending on R2 CORS config —
+    // fall back to opening the file directly so the user can save it
+    // manually (long-press → Save on mobile).
+    console.warn('Direct download failed, opening file instead', err);
+    window.open(item.mediaUrl, '_blank');
+    toast('Opened the file — use your browser\u2019s save/download option.', 'info');
+  } finally {
+    if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = originalHTML; }
+  }
+}
+
+async function shareMedia(item, btnEl) {
+  if (!item || !item.mediaUrl) return;
+  const originalHTML = btnEl ? btnEl.innerHTML : null;
+  if (btnEl) { btnEl.disabled = true; btnEl.innerHTML = '⏳ Sharing…'; }
+  try {
+    // Link-share first: near-instant (no file download needed at all), and
+    // every share target — Facebook, Instagram, WhatsApp, X/Twitter — is
+    // fine sharing a link. Trying the file-attach approach first was the
+    // actual cause of "share takes forever": it downloaded the entire
+    // video/audio file into memory BEFORE the share sheet even opened.
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: item.caption || 'Shared from Talent', text: item.caption || '', url: item.mediaUrl });
+        return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') return; // user cancelled the share sheet
+        // fall through to the file-share / clipboard fallback below
+      }
+    }
+    // File-attach is only attempted for images — small enough to fetch
+    // quickly. Video/audio deliberately skip this (see note above).
+    if (item.type === 'image' && navigator.canShare) {
+      try {
+        const res = await fetch(item.mediaUrl);
+        const blob = await res.blob();
+        const file = new File([blob], 'talent-image.jpg', { type: blob.type || 'image/jpeg' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: item.caption || 'Shared from Talent', text: item.caption || '' });
+          return;
+        }
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+      }
+    }
+    await navigator.clipboard.writeText(item.mediaUrl);
+    toast('Link copied — paste it anywhere to share.', 'success');
+  } catch (err) {
+    window.open(item.mediaUrl, '_blank');
+  } finally {
+    if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = originalHTML; }
+  }
+}
+
+async function deleteCommunityValue(itemId) {
+  if (!confirm('Delete this update? This can\u2019t be undone.')) return;
+  try {
+    const snap = await getDoc(doc(db, 'communityValue', itemId));
+    const item = snap.exists() ? snap.data() : null;
+    if (item && item.mediaPath) {
+      try { await deleteFromR2(item.mediaPath); } catch (e) { /* ignore missing file */ }
+    }
+    await deleteDoc(doc(db, 'communityValue', itemId));
+    toast('Update deleted.', 'success');
+    populateCommunityValue(currentMarketTargetUid, currentMarketIsOwner, currentMarketIsMember);
+  } catch (err) {
+    console.error('Failed to delete update', err);
+    toast('Couldn\u2019t delete that update. Please try again.', 'error');
+  }
+}
+
+$('#btn-post-update').addEventListener('click', () => {
+  const wrap = $('#cv-form-wrap');
+  wrap.style.display = wrap.style.display === 'none' ? '' : 'none';
+});
+
+const CV_ACCEPT = { image: 'image/*', video: 'video/*', audio: 'audio/*', text: '' };
+$('#cv-type').addEventListener('change', (e) => {
+  const type = e.target.value;
+  const fileField = $('#cv-file-field');
+  if (type === 'text') {
+    fileField.style.display = 'none';
+  } else {
+    fileField.style.display = '';
+    $('#cv-file-input').accept = CV_ACCEPT[type];
+  }
+});
+
+let pendingCommunityValueFile = null;
+$('#cv-file-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const sizeError = checkFileSize(file);
+  if (sizeError) { toast(sizeError, 'error'); e.target.value = ''; return; }
+  pendingCommunityValueFile = file;
+  $('#cv-file-name').textContent = file.name;
+});
+
+function resetCommunityValueForm() {
+  $('#form-community-value').reset();
+  $('#cv-file-field').style.display = '';
+  $('#cv-file-name').textContent = 'No file chosen';
+  $('#cv-progress').style.display = 'none';
+  $('#cv-progress-bar').style.width = '0%';
+  pendingCommunityValueFile = null;
+}
+
+$('#form-community-value').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  clearErrors(form);
+  const btn = $('#btn-post-community-value');
+  const type = $('#cv-type').value;
+  const caption = $('#cv-caption').value.trim();
+
+  let ok = true;
+  if (!caption) { fieldError(form.querySelector('.field')); ok = false; }
+  if (type !== 'text' && !pendingCommunityValueFile) { fieldError($('#cv-file-field')); ok = false; }
+  if (!ok) { toast('Please fix the highlighted fields.', 'error'); return; }
+  if (throttled('community-value-post', 5000)) {
+    toast('Please wait a moment before posting again.', 'info', 2200);
+    return;
+  }
+
+  setLoading(btn, true);
+  try {
+    const postId = doc(collection(db, 'communityValue')).id;
+    let mediaUrl = '', mediaPath = '';
+
+    if (type === 'image') {
+      const res = await uploadCompressedImage(pendingCommunityValueFile, `community-value/${currentUid}/${postId}.jpg`, 1200, 0.82);
+      mediaPath = res.path; mediaUrl = res.url;
+    } else if (type === 'video' || type === 'audio') {
+      const ext = (pendingCommunityValueFile.name.split('.').pop() || 'bin');
+      const key = `community-value/${currentUid}/${postId}.${ext}`;
+      $('#cv-progress').style.display = '';
+      const res = await uploadRawFileWithProgress(pendingCommunityValueFile, key, (pct) => {
+        $('#cv-progress-bar').style.width = pct + '%';
+      });
+      mediaPath = res.path; mediaUrl = res.url;
+    }
+
+    await setDoc(doc(db, 'communityValue', postId), {
+      builderId: currentUid, type, caption, mediaUrl, mediaPath, createdAt: serverTimestamp()
+    });
+
+    resetCommunityValueForm();
+    $('#cv-form-wrap').style.display = 'none';
+    toast('Posted!', 'success');
+    populateCommunityValue(currentUid, true);
+  } catch (err) {
+    console.error('Failed to post update', err);
+    toast(uploadErrorMessage(err, 'Couldn\u2019t post that update. Please try again.'), 'error', 6000);
+  } finally {
+    setLoading(btn, false);
+  }
+});
+
+function renderProductGrid(products, isOwner) {
+  const listEl = $('#bm-list');
+  if (!products.length) {
+    listEl.innerHTML = `<div class="empty-state">${isOwner ? 'You haven\u2019t added any products yet.' : 'No products here yet.'}</div>`;
+    return;
+  }
+  listEl.innerHTML = products.map(p => `
+    <div class="product-card">
+      ${p.coverUrl ? `<img class="product-cover" src="${p.coverUrl}" alt="${p.title}">` : `<div class="product-cover-fallback">${p.isDigital ? '⬇️' : '🛍️'}</div>`}
+      <div class="product-body">
+        <div class="ptitle">${p.title}</div>
+        <div class="pcat">${p.category}${p.isDigital ? ' • Digital download' : ''}</div>
+        <div class="pprice">K${Number(p.price || 0).toFixed(2)}</div>
+        <div class="product-actions">
+          ${isOwner
+            ? `<button class="btn btn-danger-outline" data-delete-product="${p.id}">Delete</button>`
+            : `<button class="btn btn-primary" disabled title="Coming in the Wallets &amp; Payments phase">${p.isDigital ? 'Buy &amp; download' : 'Buy'} — coming soon</button>`
+          }
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  if (isOwner) {
+    $$('[data-delete-product]', listEl).forEach(btn => {
+      btn.addEventListener('click', () => deleteProduct(btn.dataset.deleteProduct));
+    });
+  }
+}
+
+async function deleteProduct(productId) {
+  if (!confirm('Delete this product? This can\u2019t be undone.')) return;
+  try {
+    const snap = await getDoc(doc(db, 'products', productId));
+    const p = snap.exists() ? snap.data() : null;
+    if (p && p.coverPath) {
+      try { await deleteFromR2(p.coverPath); } catch (e) { /* ignore missing file */ }
+    }
+    if (p && p.isDigital) {
+      try {
+        const assetSnap = await getDoc(doc(db, 'products', productId, 'assets', 'main'));
+        if (assetSnap.exists() && assetSnap.data().filePath) {
+          await deleteFromR2(assetSnap.data().filePath);
+        }
+        await deleteDoc(doc(db, 'products', productId, 'assets', 'main'));
+      } catch (e) { /* ignore missing asset */ }
+    }
+    await deleteDoc(doc(db, 'products', productId));
+    toast('Product deleted.', 'success');
+    populateBuilderMarket(new URLSearchParams(`uid=${currentUid}`));
+  } catch (err) {
+    console.error('Failed to delete product', err);
+    toast('Couldn\u2019t delete that product. Please try again.', 'error');
+  }
+}
+
+// ---------- Builder Archive ----------
+let archiveItemsCache = [];
+let archiveFilter = 'all';
+
+function kindFromMime(mime) {
+  if (mime.startsWith('image/')) return 'image';
+  if (mime.startsWith('video/')) return 'video';
+  if (mime.startsWith('audio/')) return 'audio';
+  return 'other';
+}
+function archiveIcon(kind) {
+  return ({ image: '🖼️', video: '🎬', audio: '🎵' })[kind] || '📄';
+}
+
+async function populateArchive() {
+  const listEl = $('#archive-list');
+  listEl.innerHTML = '<div class="empty-state">Loading your Archive…</div>';
+  archiveFilter = 'all';
+  $$('#archive-filter .chip').forEach(c => c.classList.toggle('active', c.dataset.kind === 'all'));
+  try {
+    const q = query(collection(db, 'archive'), where('builderId', '==', currentUid), limit(100));
+    const snap = await getDocs(q);
+    archiveItemsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    renderArchiveList();
+  } catch (err) {
+    console.error('Failed to load archive', err);
+    listEl.innerHTML = '<div class="empty-state">Couldn\u2019t load your Archive right now. Pull to refresh and try again.</div>';
+  }
+}
+
+function renderArchiveList() {
+  const listEl = $('#archive-list');
+  const items = archiveFilter === 'all' ? archiveItemsCache : archiveItemsCache.filter(i => i.kind === archiveFilter);
+  if (!items.length) {
+    listEl.innerHTML = '<div class="empty-state">Nothing here yet. Upload a photo, video, or music file to get started.</div>';
+    return;
+  }
+  listEl.innerHTML = items.map(item => `
+    <div class="archive-card">
+      <div class="archive-ic">${archiveIcon(item.kind)}</div>
+      <div class="archive-info">
+        <div class="atitle">${item.title}</div>
+        <div class="ameta">${item.kind} • ${item.fileSizeBytes ? Math.round(item.fileSizeBytes / 1024) + ' KB' : ''}</div>
+      </div>
+      <div class="archive-actions">
+        <button class="icon-btn" data-view-archive="${item.id}" title="View">👁️</button>
+        <button class="icon-btn" data-delete-archive="${item.id}" title="Delete">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+
+  $$('[data-view-archive]', listEl).forEach(btn => {
+    btn.addEventListener('click', () => viewArchiveItem(btn.dataset.viewArchive));
+  });
+  $$('[data-delete-archive]', listEl).forEach(btn => {
+    btn.addEventListener('click', () => deleteArchiveItem(btn.dataset.deleteArchive));
+  });
+}
+
+$$('#archive-filter .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    archiveFilter = chip.dataset.kind;
+    $$('#archive-filter .chip').forEach(c => c.classList.toggle('active', c === chip));
+    renderArchiveList();
+  });
+});
+
+async function viewArchiveItem(itemId) {
+  const item = archiveItemsCache.find(i => i.id === itemId);
+  if (!item) return;
+  try {
+    const url = await presignDownload(item.filePath);
+    window.open(url, '_blank');
+  } catch (err) {
+    console.error('Failed to open archive item', err);
+    toast('Couldn\u2019t open that file. Please try again.', 'error');
+  }
+}
+
+async function deleteArchiveItem(itemId) {
+  if (!confirm('Delete this from your Archive? This can\u2019t be undone.')) return;
+  const item = archiveItemsCache.find(i => i.id === itemId);
+  if (!item) return;
+  try {
+    try { await deleteFromR2(item.filePath); } catch (e) { /* ignore missing file */ }
+    await deleteDoc(doc(db, 'archive', itemId));
+    toast('Deleted from Archive.', 'success');
+    populateArchive();
+  } catch (err) {
+    console.error('Failed to delete archive item', err);
+    toast('Couldn\u2019t delete that item. Please try again.', 'error');
+  }
+}
+
+let pendingArchiveFile = null;
+$('#av-file-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const sizeError = checkFileSize(file);
+  if (sizeError) { toast(sizeError, 'error'); e.target.value = ''; return; }
+  pendingArchiveFile = file;
+  $('#av-file-name').textContent = file.name;
+});
+
+function resetArchiveUploadForm() {
+  $('#form-archive-upload').reset();
+  $('#av-file-name').textContent = 'No file chosen';
+  $('#av-progress').style.display = 'none';
+  $('#av-progress-bar').style.width = '0%';
+  pendingArchiveFile = null;
+}
+
+// Guards against the "UI twinkling" bug: if a user starts an upload, then
+// navigates away before it finishes (e.g. hits back mid-upload) and starts
+// a SECOND upload, the first XHR is still running in the background — SPAs
+// don't cancel in-flight requests just because the screen changed. Both
+// uploads' onProgress callbacks would then race to update the same shared
+// #av-progress-bar element, which looks exactly like flickering until the
+// abandoned one finally finishes. Each upload attempt gets a generation
+// number; any DOM update from an attempt that's since been superseded is
+// silently ignored instead of fighting the current one.
+let archiveUploadGen = 0;
+
+$('#form-archive-upload').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  clearErrors(form);
+  const btn = $('#btn-archive-upload');
+  const title = $('#av-title').value.trim();
+
+  let ok = true;
+  if (!title) { fieldError(form.querySelector('[data-field=title]')); ok = false; }
+  if (!pendingArchiveFile) { fieldError(form.querySelector('[data-field=file]')); ok = false; }
+  if (!ok) { toast('Please fix the highlighted fields.', 'error'); return; }
+
+  const myUploadGen = ++archiveUploadGen;
+  setLoading(btn, true);
+  try {
+    const kind = kindFromMime(pendingArchiveFile.type || '');
+    const itemId = doc(collection(db, 'archive')).id;
+    const ext = (pendingArchiveFile.name.split('.').pop() || 'bin');
+    const key = `archive/${currentUid}/${itemId}.${ext}`;
+
+    $('#av-progress').style.display = '';
+    const { path } = await uploadRawFileWithProgress(pendingArchiveFile, key, (pct) => {
+      if (myUploadGen !== archiveUploadGen) return; // superseded by a newer upload — ignore this stale progress event
+      $('#av-progress-bar').style.width = pct + '%';
+    });
+
+    if (myUploadGen !== archiveUploadGen) return; // a newer attempt has taken over — don't act on this abandoned one
+
+    await setDoc(doc(db, 'archive', itemId), {
+      builderId: currentUid, title, kind, filePath: path,
+      fileName: pendingArchiveFile.name, fileType: pendingArchiveFile.type,
+      fileSizeBytes: pendingArchiveFile.size, createdAt: serverTimestamp()
+    });
+
+    resetArchiveUploadForm();
+    toast('Saved to Archive!', 'success');
+    window.location.hash = '#/archive';
+  } catch (err) {
+    if (myUploadGen !== archiveUploadGen) {
+      console.warn('A superseded Archive upload failed in the background (ignored):', err);
+      return;
+    }
+    console.error('Failed to upload to archive', err);
+    toast(uploadErrorMessage(err, 'Couldn\u2019t upload that file. Please try again.'), 'error', 6000);
+  } finally {
+    if (myUploadGen === archiveUploadGen) setLoading(btn, false);
+  }
+});
+
+function populateSoon(params) {
+  $('#soon-title').textContent = params.get('title') || 'Coming soon';
+  $('#soon-heading').textContent = params.get('title') || 'Coming soon';
+  $('#soon-body').textContent = params.get('body') || 'This part of the platform is being built next.';
+}
+
+function render() {
+  if (!authReady || !minSplashElapsed) { showScreen('screen-splash'); return; }
+
+  const { path: rawPath, params } = parseHash();
+  let path = rawPath;
+
+  if (auth.currentUser && currentUserDoc) {
+    if (PUBLIC_ROUTES.includes(path) || !routeIdFromPath(path)) {
+      path = homeRouteForRole(currentUserDoc);
+    }
+    if (path === '#/pending' && currentUserDoc.role === 'builder' && currentUserDoc.isActive) {
+      path = '#/builder-dashboard';
+    }
+    // Inactive Builders (subscription not yet paid) are confined to the
+    // Pending screen across every authenticated route, not just the dashboard.
+    if (path !== '#/pending' && currentUserDoc.role === 'builder' && !currentUserDoc.isActive) {
+      path = '#/pending';
+    }
+
+    // Add Product and Archive are Builder-only real estate.
+    if (['#/add-product', '#/archive', '#/archive-upload'].includes(path) && currentUserDoc.role !== 'builder') {
+      path = homeRouteForRole(currentUserDoc);
+    }
+
+    // A populate function throwing must never silently freeze navigation —
+    // that's exactly what made a successful login look "stuck" on the auth
+    // screen before: the screen switch below simply never ran. Whatever
+    // happens inside a specific screen's setup, the user still gets moved
+    // to the right screen.
+    try {
+      if (path === '#/pending') populatePending();
+      else if (path === '#/builder-dashboard') populateBuilderDashboard();
+      else if (path === '#/community-dashboard') populateCommunityDashboard();
+      else if (path === '#/profile') populateProfile();
+      else if (path === '#/edit-profile') populateEditProfile();
+      else if (path === '#/wallet') populateWallet();
+      else if (path === '#/discover') populateDiscoverScreen();
+      else if (path === '#/joined-communities') populateJoinedCommunities();
+      else if (path === '#/builder-market') populateBuilderMarket(params);
+      else if (path === '#/add-product') resetAddProductForm();
+      else if (path === '#/archive') populateArchive();
+      else if (path === '#/archive-upload') resetArchiveUploadForm();
+      else if (path === '#/soon') populateSoon(params);
+    } catch (err) {
+      console.error(`Screen setup failed for ${path} (navigation continuing anyway):`, err);
+    }
+  } else if (auth.currentUser && !currentUserDoc) {
+    // Signed in with Firebase Auth, but we don't have their Firestore
+    // profile yet (still loading, or it failed and is being retried).
+    // Staying on whatever screen is currently showing is correct here —
+    // NOT bouncing to Welcome/Login, which would look like login silently
+    // failed even though it actually succeeded.
+    return;
+  } else {
+    if (!PUBLIC_ROUTES.includes(path)) path = '#/welcome';
+  }
+
+  const rawPathOnly = rawPath.split('?')[0];
+  const target = path + (path === rawPathOnly && rawPath.includes('?') ? '?' + rawPath.split('?')[1] : '');
+  if (window.location.hash !== target) window.location.hash = target;
+  showScreen(routeIdFromPath(path) || 'screen-welcome');
+  updateBottomNav(path, target);
+}
+
+window.addEventListener('hashchange', render);
+
+// Loads the signed-in user's Firestore profile, retrying a few times with
+// a short escalating delay. Two distinct failure modes need this:
+// 1) A brief window right after sign-in where Firestore's client can
+//    evaluate a read as unauthenticated even though Firebase Auth has
+//    already resolved.
+// 2) On a FRESH REGISTRATION specifically: this function can be called by
+//    onAuthStateChanged at almost the exact same moment the registration
+//    handler is still writing that very same users/{uid} doc. If the read
+//    wins that race, snap.exists() is false — not an error — so the old
+//    version of this function gave up immediately with no retry at all,
+//    regardless of network quality. That's what "couldn't load your
+//    account" even on a fine connection turned out to be.
+async function loadUserProfileWithRetry(uid, attempts = 5, delayMs = 400) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const snap = await getDoc(doc(db, 'users', uid));
+      if (snap.exists()) return snap.data();
+      if (i === attempts - 1) return null;
+      await new Promise((resolve) => setTimeout(resolve, delayMs * (i + 1)));
+    } catch (err) {
+      if (i === attempts - 1) throw err;
+      await new Promise((resolve) => setTimeout(resolve, delayMs * (i + 1)));
+    }
+  }
+  return null;
+}
+
+onAuthStateChanged(auth, async (user) => {
+  authReady = true;
+  if (user) {
+    const isNewSession = currentUid !== user.uid;
+    currentUid = user.uid;
+    try {
+      const loaded = await loadUserProfileWithRetry(user.uid);
+      // Don't let a stale/racy null clobber a currentUserDoc we already
+      // set directly (e.g. right after registration — see the register
+      // handlers). Only trust a null result if this is genuinely a fresh
+      // session with nothing set yet.
+      if (loaded || isNewSession || !currentUserDoc) {
+        currentUserDoc = loaded;
+      }
+      if (!currentUserDoc) {
+        toast('We couldn\u2019t load your account. Please try logging in again.', 'error', 6000);
+      }
+    } catch (err) {
+      console.error('Failed to load user profile after retries', err);
+      if (!currentUserDoc) {
+        toast('We couldn\u2019t load your account — check your connection and try again.', 'error', 6000);
+      }
+    }
+    if (currentUserDoc) startPresenceHeartbeat();
+  } else {
+    currentUid = null;
+    currentUserDoc = null;
+    stopPresenceHeartbeat();
+  }
+  render();
+});
+
+// Splash minimum display time — auth can resolve almost instantly from a
+// cached session, so we gate rendering on a real timer, not just on authReady.
+showScreen('screen-splash');
+setTimeout(() => { minSplashElapsed = true; render(); }, 1700);
+</script>
+</body>
+</html>
