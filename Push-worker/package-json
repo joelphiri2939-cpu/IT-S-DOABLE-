@@ -1,1 +1,17 @@
-1
+{
+  "name": "idt-push-worker",
+  "version": "1.0.0",
+  "description": "IT'S DOABLE! TALENT — Web Push sender, running on Cloudflare Workers.",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@pushforge/builder": "^2.0.5",
+    "jose": "^5.6.3"
+  },
+  "devDependencies": {
+    "wrangler": "^3.78.0"
+  }
+}
