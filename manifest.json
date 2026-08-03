@@ -1,7 +1,7 @@
 {
   "id": "./",
   "name": "IT'S DOABLE! TALENT",
-  "short_name": "Talent",
+  "short_name": "IT'S DOABLE",
   "description": "A media platform where Builders share photos, videos, and music with their own community — join, watch Reels, and support the creators you follow.",
   "start_url": "./index.html",
   "scope": "./",
