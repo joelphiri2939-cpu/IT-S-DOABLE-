@@ -77,12 +77,30 @@ self.addEventListener('push', (event) => {
   let payload = {};
   try { payload = event.data ? event.data.json() : {}; } catch (err) { /* fall through to defaults below */ }
 
-  const title = payload.title || "IT'S DOABLE! TALENT";
+  // Branding is always shown, never left to the payload — this is what
+  // makes every notification instantly recognizable as coming from the
+  // app, with its name and logo, rather than just a bare message.
+  const APP_NAME = "IT'S DOABLE! TALENT";
+  const APP_ICON = './icons/icon-192.png';   // small icon next to the notification
+  const APP_BADGE = './icons/icon-192.png';  // monochrome status-bar badge (Android)
+
+  const title = APP_NAME;
+
+  // If the worker sends a more specific heading (e.g. "New comment"),
+  // it's folded into the body as a bold-ish lead-in above the message,
+  // instead of replacing the app name in the title bar.
+  const messageBody = payload.body || payload.message || '';
+  const body = (payload.title && payload.title !== APP_NAME)
+    ? `${payload.title}\n${messageBody}`
+    : messageBody;
+
   const options = {
-    body: payload.body || '',
-    icon: payload.icon || './icons/icon-192.png',
-    badge: payload.badge || './icons/icon-192.png',
+    body,
+    icon: APP_ICON,
+    badge: APP_BADGE,
+    image: payload.image || undefined, // optional larger banner image, if the worker sends one
     tag: payload.tag || 'general',
+    renotify: true,
     data: payload.data || { url: './' },
     vibrate: [80, 40, 80]
   };
