@@ -90,7 +90,7 @@ self.addEventListener('push', (event) => {
   // makes every notification instantly recognizable as coming from the
   // app, with its name and logo, rather than just a bare message.
   const APP_NAME = "IT'S DOABLE! TALENT";
-  const APP_ICON = './icons/icon-512.png';               // small icon next to the notification
+  const APP_ICON = './icons/icon-192.png';               // small icon next to the notification
   const APP_BADGE = './icons/badge-monochrome.png';       // Android status-bar badge — must be a plain white-on-transparent
                                                            // silhouette; Android re-masks whatever it's given anyway, so a
                                                            // full-colour logo here just renders as a mangled blob.
