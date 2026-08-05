@@ -1,4 +1,4 @@
-   // IT'S DOABLE! TALENT — Service Worker
+// IT'S DOABLE! TALENT — Service Worker
 // Cache the app shell for fast/offline loads. Firestore handles its own
 // offline persistence for data; this SW only concerns itself with static assets.
 
@@ -9,7 +9,7 @@ const APP_SHELL = [
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/icon-512-maskable.png',
+  './icons/icon-maskable-1080.png',
   './icons/badge-monochrome.png',
   './icons/notification-banner.png'
 ];
@@ -145,4 +145,3 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
-   
