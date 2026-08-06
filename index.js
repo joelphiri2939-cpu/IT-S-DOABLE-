@@ -74,9 +74,10 @@ async function requireAuth(req, res, next) {
 }
 
 // ---------------- Ownership rules ----------------
-// Mirrors the old Firebase Storage rules: a user may only write inside
-// their own folder. product-files stays private (no publicUrl returned)
-// until the Payments phase gates downloads behind a paid-order check.
+// Mirrors the old Firebase Storage rules: a user may only WRITE inside
+// their own folder. This stays true for uploads/deletes across every
+// prefix, including product-files. It is NOT true for reading/downloading
+// product-files — see the dedicated handling in presign-download below.
 const OWNED_PREFIXES = [
   { prefix: (uid) => `profiles/${uid}/`, public: true },
   { prefix: (uid) => `covers/${uid}/`, public: true },
@@ -105,6 +106,11 @@ const MAX_SIZES = {
 function maxSizeFor(key) {
   const hit = Object.keys(MAX_SIZES).find((p) => key.startsWith(p));
   return hit ? MAX_SIZES[hit] : 15 * 1024 * 1024;
+}
+
+async function presignGet(key) {
+  const command = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
+  return getSignedUrl(s3, command, { expiresIn: 300 });
 }
 
 // ---------------- App ----------------
@@ -147,11 +153,29 @@ app.post('/api/r2/presign-download', requireAuth, async (req, res) => {
     const { key } = req.body || {};
     if (!key || typeof key !== 'string') return res.status(400).json({ error: 'Missing key.' });
 
+    // FIX: product-files/ is the IT'S DOABLE STORE's paid-download folder.
+    // resolveOwnedPrefix() below requires req.uid (the person clicking
+    // Download) to match the {uid} segment the file lives under — correct
+    // for archive/ (strictly private to its own builder), but backwards
+    // for product-files/, where the entire point is that OTHER signed-in
+    // users (buyers) download a listing that some seller uploaded. That
+    // ownership check silently 403'd every download made by anyone except
+    // the file's own uploader — i.e. almost every real Store download,
+    // since sellers essentially never buy their own listings. This is the
+    // same class of bug already fixed on the Firestore assets rule (which
+    // was opened to any signed-in user pending Payments); this route just
+    // hadn't been updated to match. Any signed-in user may fetch a
+    // product-files download URL for now — tighten this to a real
+    // purchase-order check once Payments ships.
+    if (key.startsWith('product-files/')) {
+      const downloadUrl = await presignGet(key);
+      return res.json({ downloadUrl });
+    }
+
     const match = resolveOwnedPrefix(req.uid, key);
     if (!match) return res.status(403).json({ error: 'You can only view your own files.' });
 
-    const command = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
-    const downloadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
+    const downloadUrl = await presignGet(key);
     res.json({ downloadUrl });
   } catch (err) {
     console.error('presign-download failed:', err);
